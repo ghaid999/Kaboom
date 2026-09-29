@@ -43,3 +43,311 @@
 3. As a user, I want multiple user profiles on one robot, so that my family/roommates can each track their own sessions.
 
 4. As a user, I want voice control, so that I can start/stop sessions hands-free.
+
+# FocusRobot: Components, Classes, and Database Design
+
+**Tech stack:** MySQL 8 (database)
+
+---
+
+## Table of Contents
+
+1. [Class Diagram](#1-class-diagram)
+2. [ER Diagram](#2-er-diagram)
+3. [Database Schema (MySQL 8)](#3-database-schema-mysql-8)
+4. [Navigation Flow](#4-navigation-flow)
+5. [API Mapping](#5-api-mapping)
+
+---
+
+## 1. Class Diagram
+
+```mermaid
+classDiagram
+    class User {
+        +int id
+        +string name
+        +string email
+        -string passwordHash
+        +int coins
+        +string role
+        +datetime createdAt
+        +register() bool
+        +login() bool
+        +update() bool
+        +delete() bool
+        +addReward(amount) void
+    }
+
+    class Admin {
+        +addProduct(product) bool
+    }
+
+    class FocusSession {
+        +int sessionId
+        +int userId
+        +int robotId
+        +int plannedDurationSeconds
+        +datetime startTime
+        +datetime endTime
+        +int durationSeconds
+        +int pausedSeconds
+        +float focusedPercentage
+        +int rewardEarned
+        +string status
+        +startSession() void
+        +endSession() void
+        +pauseSession() void
+        +continueSession() void
+        +calculateReward() int
+        +sessionSummary() dict
+    }
+
+    class StateLog {
+        +int id
+        +int sessionId
+        +string state
+        +datetime startedAt
+        +datetime endedAt
+    }
+
+    class Robot {
+        +int robotId
+        +int userId
+        +string currentExpression
+        +string connectionState
+        +updateExpression(state) void
+        +connect() bool
+    }
+
+    class ComputerVision {
+        +bool eyesDetection
+        +string state
+        +detectState() string
+    }
+
+    class Product {
+        +int id
+        +string name
+        +int price
+        +string description
+        +bool isAvailable
+    }
+
+    class Purchase {
+        +int id
+        +int userId
+        +int productId
+        +int pricePaid
+        +datetime purchasedAt
+    }
+
+    class Store {
+        +getProducts() list
+        +addProduct(product) bool
+        +buy(userId, productId) bool
+    }
+
+    User <|-- Admin
+    User "1" --> "0..1" Robot : owns
+    User "1" --> "0..*" FocusSession : starts
+    Robot "1" --> "0..*" FocusSession : runs
+    FocusSession "1" --> "0..*" StateLog : records
+    Robot "1" --> "1" ComputerVision : uses
+    ComputerVision ..> StateLog : provides state
+    Store "1" o-- "0..*" Product : contains
+    Store ..> Purchase : creates
+    User "1" --> "0..*" Purchase : makes
+    Product "1" --> "0..*" Purchase : appears in
+    Admin ..> Store : manages
+```
+
+---
+
+## 2. ER Diagram
+
+```mermaid
+erDiagram
+    USERS ||--o| ROBOTS : owns
+    USERS ||--o{ FOCUS_SESSIONS : starts
+    ROBOTS ||--o{ FOCUS_SESSIONS : runs
+    FOCUS_SESSIONS ||--o{ STATE_LOGS : has
+    USERS ||--o{ PURCHASES : makes
+    PRODUCTS ||--o{ PURCHASES : "bought in"
+
+    USERS {
+        int id PK
+        varchar name
+        varchar email UK
+        varchar password_hash
+        int coins
+        enum role "user or admin"
+        tinyint admin_flag UK "generated, NULL for non-admin"
+        datetime created_at
+    }
+
+    ROBOTS {
+        int id PK
+        int user_id FK, UK
+        enum current_expression "happy, sad, confused"
+        enum connection_state "connected, disconnected"
+    }
+
+    FOCUS_SESSIONS {
+        int id PK
+        int user_id FK
+        int robot_id FK "nullable"
+        int planned_duration_seconds
+        datetime start_time
+        datetime end_time "nullable"
+        int duration_seconds
+        int paused_seconds
+        decimal focused_percentage "nullable"
+        int reward_earned
+        enum status "active, paused, completed"
+    }
+
+    STATE_LOGS {
+        bigint id PK
+        int session_id FK
+        enum state "focused, distracted, away"
+        datetime started_at
+        datetime ended_at "nullable"
+    }
+
+    PRODUCTS {
+        int id PK
+        varchar name
+        int price
+        text description "nullable"
+        boolean is_available
+    }
+
+    PURCHASES {
+        int id PK
+        int user_id FK
+        int product_id FK
+        int price_paid
+        datetime purchased_at
+    }
+```
+
+**Relationships**
+
+- User 1 : 0..1 Robot
+- User 1 : N FocusSession
+- Robot 1 : N FocusSession
+- FocusSession 1 : N StateLog
+- User M : N Product (through `purchases`)
+
+---
+
+## 3. Database Schema (MySQL 8)
+
+Create the tables in this order because of the foreign keys.
+
+```sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    coins INT NOT NULL DEFAULT 0 CHECK (coins >= 0),
+    role ENUM('user','admin') NOT NULL DEFAULT 'user',
+    admin_flag TINYINT GENERATED ALWAYS AS (IF(role = 'admin', 1, NULL)) VIRTUAL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_single_admin (admin_flag)
+);
+
+CREATE TABLE robots (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    current_expression ENUM('happy','sad','confused') NOT NULL DEFAULT 'happy',
+    connection_state ENUM('connected','disconnected') NOT NULL DEFAULT 'disconnected',
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE focus_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    robot_id INT NULL,
+    planned_duration_seconds INT NOT NULL DEFAULT 1800,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NULL,
+    duration_seconds INT NOT NULL DEFAULT 0,
+    paused_seconds INT NOT NULL DEFAULT 0,
+    focused_percentage DECIMAL(5,2) NULL,
+    reward_earned INT NOT NULL DEFAULT 0,
+    status ENUM('active','paused','completed') NOT NULL DEFAULT 'active',
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (robot_id) REFERENCES robots(id) ON DELETE SET NULL
+);
+
+CREATE TABLE state_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    session_id INT NOT NULL,
+    state ENUM('focused','distracted','away') NOT NULL,
+    started_at DATETIME NOT NULL,
+    ended_at DATETIME NULL,
+    FOREIGN KEY (session_id) REFERENCES focus_sessions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price INT NOT NULL CHECK (price > 0),
+    description TEXT NULL,
+    is_available BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE purchases (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    price_paid INT NOT NULL,
+    purchased_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+);
+```
+
+---
+
+## 4. Navigation Flow
+
+```mermaid
+flowchart TD
+    Register["Register"] --> Login["Login"]
+    Login --> Home["Home"]
+
+    Home --> Menu(["Hamburger Menu"])
+    Menu --> Robot["Robot Connection"]
+    Menu --> History["Progress / History"]
+    Menu --> Store["Store"]
+    Menu --> Profile["Profile"]
+
+    Home --> Session["Focus Session"]
+    Session --> Summary["Session Summary"]
+    Summary --> Home
+    History --> Summary
+
+    Store --> AddProduct["Add Product (Admin only)"]
+    Profile --> Login
+```
+
+Navigation uses a **Hamburger Menu** (Drawer), as in the Figma design.
+
+---
+
+## 5. API Mapping
+
+| Action | Endpoint |
+|---|---|
+| Register / Login | `POST /auth/register` / `POST /auth/login` |
+| User data | `GET/PUT/DELETE /users/me` |
+| Robot | `POST /robot/connect`, `GET /robot` |
+| Start session | `POST /sessions` |
+| Pause / Continue / End | `PATCH /sessions/{id}/pause`, `/continue`, `/end` |
+| History and summary | `GET /sessions`, `GET /sessions/{id}` |
+| Products | `GET /products`, `POST /products` (admin) |
+| Purchase | `POST /purchases` |

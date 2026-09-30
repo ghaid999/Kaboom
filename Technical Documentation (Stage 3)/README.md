@@ -26,14 +26,14 @@
 
 2. As a user, I want to pause a session, so that I can take a short break without losing my progress or streak.
 
+3. As a user, I want different expression "themes" for the robot, so that I can personalize how it communicates with me.
+
 ### Could Have
 1. As a user, I want to set daily or weekly focus goals, so that I can build consistent study habits.
 
 2. As a user, I want to compare my stats with friends, so that I stay motivated through light competition.
 
-3. As a user, I want different expression "themes" for the robot, so that I can personalize how it communicates with me.
-
-4. As a user, I want a gentle audio or light cue when I'm distracted, so that I can self-correct without a jarring interruption.
+3. As a user, I want a gentle audio or light cue when I'm distracted, so that I can self-correct without a jarring interruption.
 
 ### Won't Have
 1. As a user, I want the robot to physically move or gesture, so that it feels more lifelike — out of scope for a simple 3D-printed prototype.

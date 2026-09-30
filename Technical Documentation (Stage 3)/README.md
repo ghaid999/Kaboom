@@ -16,15 +16,15 @@
 5. As a user, I want to receive coins when I complete a session, so that I feel rewarded for staying focused.
 
 6. As a user, I want the app to confirm when a session ends (completed or cut short), so that I know the outcome clearly.
+   
+7. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
+
+8. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
 
 ### Should Have
 1. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
 
-2. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
-
-3. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
-
-4. As a user, I want to pause a session, so that I can take a short break without losing my progress or streak.
+2. As a user, I want to pause a session, so that I can take a short break without losing my progress or streak.
 
 ### Could Have
 1. As a user, I want to set daily or weekly focus goals, so that I can build consistent study habits.

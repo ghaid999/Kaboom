@@ -5,21 +5,25 @@
 ### User Stories (MoSCoW)
 
 ### Must Have
-1. As a user, I want to start a focus session and select a target duration, so that I can begin working with a clear, time-bound goal.
+1. As a user, I want to register as a new user, so that I can create an account and use the application.
 
-2. As a user, I want the robot to detect whether I'm FOCUSED, DISTRACTED, or AWAY, so that my attention is tracked accurately without manual input.
+2. As a user, I want to connect my mobile app to the robot, so that the app can communicate with and control my robot during focus sessions.
 
-3. As a user, I want the robot's screen to show a facial expression matching my current focus state, so that I get immediate, non-intrusive feedback.
+3. As a user, I want to start a focus session and select a target duration, so that I can begin working with a clear, time-bound goal.
 
-4. As a user, I want to see my live session status in the mobile app, so that I can monitor progress alongside the robot's feedback.
+4. As a user, I want the robot to detect whether I'm FOCUSED, DISTRACTED, or AWAY, so that my attention is tracked accurately without manual input.
 
-5. As a user, I want to receive coins when I complete a session, so that I feel rewarded for staying focused.
+5. As a user, I want the robot's screen to show a facial expression matching my current focus state, so that I get immediate, non-intrusive feedback.
 
-6. As a user, I want the app to confirm when a session ends (completed or cut short), so that I know the outcome clearly.
+6. As a user, I want to see my live session status in the mobile app, so that I can monitor progress alongside the robot's feedback.
+
+7. As a user, I want to receive coins when I complete a session, so that I feel rewarded for staying focused.
+
+8. As a user, I want the app to confirm when a session ends (completed or cut short), so that I know the outcome clearly.
    
-7. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
+9. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
 
-8. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
+10. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
 
 ### Should Have
 1. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.

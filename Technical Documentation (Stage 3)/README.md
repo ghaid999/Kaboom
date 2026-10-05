@@ -81,6 +81,7 @@ classDiagram
         +update() bool
         +delete() bool
         +addReward(amount) void
+        +buy(productId) bool
     }
 
     class Admin {
@@ -136,6 +137,7 @@ classDiagram
         +int price
         +string description
         +bool isAvailable
+        +getProducts()$ list
     }
 
     class Purchase {
@@ -146,12 +148,6 @@ classDiagram
         +datetime purchasedAt
     }
 
-    class Store {
-        +getProducts() list
-        +addProduct(product) bool
-        +buy(userId, productId) bool
-    }
-
     User <|-- Admin
     User "1" --> "0..1" Robot : owns
     User "1" --> "0..*" FocusSession : starts
@@ -159,11 +155,9 @@ classDiagram
     FocusSession "1" --> "0..*" StateLog : records
     Robot "1" --> "1" ComputerVision : uses
     ComputerVision ..> StateLog : provides state
-    Store "1" o-- "0..*" Product : contains
-    Store ..> Purchase : creates
     User "1" --> "0..*" Purchase : makes
-    Product "1" --> "0..*" Purchase : appears in
-    Admin ..> Store : manages
+    Purchase "0..*" --> "0..*" Product : for
+    Admin ..> Product : manages
 ```
 
 ---

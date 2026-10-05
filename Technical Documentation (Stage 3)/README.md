@@ -337,6 +337,69 @@ CREATE TABLE purchases (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 ```
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as Mobile App
+    participant Backend as FastAPI Backend
+    participant DB as MySQL Database
+    participant Robot as Robot
+
+    User->>App: Select target duration
+    App->>Backend: Start focus session
+    Backend->>DB: Create focus session
+    DB-->>Backend: Session created
+    Backend->>Robot: Start monitoring
+    Robot-->>Backend: Monitoring started
+    Backend-->>App: Session started
+    App-->>User: Display active session
+```
+```mermaid
+sequenceDiagram
+    participant Camera
+    participant Robot as  Robot
+    participant CV as OpenCV / MediaPipe
+    participant Backend as FastAPI Backend
+    participant DB as MySQL Database
+    participant App as Mobile App
+    participant Screen as Robot Display
+
+    Camera->>Robot: Capture video frames
+    Robot->>CV: Process video frame
+    CV->>CV: Detect focus state
+
+    alt User is focused
+        CV-->>Robot: FOCUSED
+        Robot->>Screen: Display focused expression
+    else User is distracted
+        CV-->>Robot: DISTRACTED
+        Robot->>Screen: Display distracted expression
+    else User is away
+        CV-->>Robot: AWAY
+        Robot->>Screen: Display away expression
+    end
+
+    Robot->>Backend: Send focus state
+    Backend->>DB: Save focus event
+    Backend-->>App: Send live focus status
+    App-->>User: Display current focus state
+```
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as Mobile App
+    participant Backend as FastAPI Backend
+    participant DB as MySQL Database
+
+    User->>App: Complete focus session
+    App->>Backend: Send session completion
+    Backend->>Backend: Calculate reward
+    Backend->>DB: Update user's coins
+    Backend->>DB: Save reward
+    DB-->>Backend: Reward saved
+    Backend-->>App: Send earned coins
+    App-->>User: Display earned coins
+```
 
 ---
 

@@ -56,15 +56,44 @@
 
 ## Table of Contents
 
-1. [Class Diagram](#1-class-diagram)
-2. [ER Diagram](#2-er-diagram)
-3. [Database Schema (MySQL 8)](#3-database-schema-mysql-8)
-4. [Navigation Flow](#4-navigation-flow)
-5. [API Mapping](#5-api-mapping)
+1. [System Architecture](#1-system-architecture)
+2. [Class Diagram](#2-class-diagram)
+3. [ER Diagram](#3-er-diagram)
+4. [Database Schema (MySQL 8)](#4-database-schema-mysql-8)
+
 
 ---
+## 1. System Architecture
 
-## 1. Class Diagram
+```mermaid
+flowchart TB
+    User(["USER"])
+
+    Frontend["<b>FRONTEND</b><br/>Flutter<br/><br/>• Login / Register<br/>• Focus Session<br/>• Timer<br/>• Robot Status<br/>• Rewards / Store"]
+
+    subgraph Cloud["Cloud Hosting"]
+        Backend["<b>BACKEND</b><br/>Spring Boot<br/><br/>• Authentication<br/>• Session Management<br/>• Robot Management<br/>• Reward Management"]
+        DB[("<b>DATABASE</b><br/>MySQL<br/><br/>• Users<br/>• Robots<br/>• Sessions<br/>• Events<br/>• Rewards<br/>• Store")]
+    end
+
+    subgraph Robot["Robot Device"]
+        Pi["<b>RASPBERRY PI 4</b><br/><br/>• OpenCV<br/>• MediaPipe<br/>• Focus Detection<br/>• Robot Control"]
+        Camera["Camera"]
+        Screen["Screen<br/>(facial expressions)"]
+    end
+
+    Behavior(["User Behavior"])
+
+    User <-->|"uses app"| Frontend
+    Frontend <-->|"REST API + WebSocket<br/>requests / live status"| Backend
+    Backend <-->|"SQL<br/>read / write"| DB
+    Backend <-->|"WebSocket<br/>commands / focus states"| Pi
+    Behavior -->|"observed"| Camera
+    Camera -->|"video frames<br/>(stay on device)"| Pi
+    Pi -->|"expression"| Screen
+```
+
+## 2. Class Diagram
 
 ```mermaid
 classDiagram
@@ -162,7 +191,7 @@ classDiagram
 
 ---
 
-## 2. ER Diagram
+## 3. ER Diagram
 
 ```mermaid
 erDiagram
@@ -240,7 +269,7 @@ erDiagram
 
 ---
 
-## 3. Database Schema (MySQL 8)
+## 4. Database Schema (MySQL 8)
 
 Create the tables in this order because of the foreign keys.
 
@@ -311,33 +340,7 @@ CREATE TABLE purchases (
 
 ---
 
-## 4. Navigation Flow
-
-```mermaid
-flowchart TD
-    Register["Register"] --> Login["Login"]
-    Login --> Home["Home"]
-
-    Home --> Menu(["Hamburger Menu"])
-    Menu --> Robot["Robot Connection"]
-    Menu --> History["Progress / History"]
-    Menu --> Store["Store"]
-    Menu --> Profile["Profile"]
-
-    Home --> Session["Focus Session"]
-    Session --> Summary["Session Summary"]
-    Summary --> Home
-    History --> Summary
-
-    Store --> AddProduct["Add Product (Admin only)"]
-    Profile --> Login
-```
-
-Navigation uses a **Hamburger Menu** (Drawer), as in the Figma design.
-
----
-
-## 5. API Mapping
+## 4. API Mapping
 
 | Action | Endpoint |
 |---|---|

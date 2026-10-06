@@ -48,6 +48,24 @@
 
 4. As a user, I want voice control, so that I can start/stop sessions hands-free.
 
+### Mockups
+
+Interactive Figma prototype: [FocusRobot (Kaboom) Mockups](https://www.figma.com/design/av0ip8R6icJggihhZaXFMo/Kaboom-?node-id=1-3&p=f&t=6P1tw5wPOf7ddRQe-0)
+
+#### Mockup overview
+
+| Screen | Preview | Covers |
+|---|---|---|
+| Sign Up | <img width="150" alt="Sign Up" src="https://github.com/user-attachments/assets/a60ecd3b-781d-4c3d-bed6-c49424335a4d" /> | Must Have 1 (register) |
+| Login | <img width="150" alt="Login" src="https://github.com/user-attachments/assets/23ba9c4f-9ff7-4c64-8cc9-919ce6e38ef0" /> | Must Have 2 (account access) |
+| Connect | <img width="150" alt="Connect" src="https://github.com/user-attachments/assets/67e5ed13-36e7-472f-b559-8dc335fcdbbc" /> | Must Have 2 (pair the robot with the app) |
+| Homepage | <img width="150" alt="Homepage" src="https://github.com/user-attachments/assets/4f299bfb-7811-422a-894d-9448eb4c5bfc" /> | Must Have 3 (select a target duration and start a session) |
+| Focused Status in Session | <img width="150" alt="Focused Status in Session" src="https://github.com/user-attachments/assets/860256c4-7c4d-44d6-a810-256556cab2f2" /> | Must Have 4, 5, 6 (focus state, expression, live status) |
+| Distracted Status in Session | <img width="150" alt="Distracted Status In Session" src="https://github.com/user-attachments/assets/c8cd5bac-148f-450f-8499-35d024223bbb" /> | Must Have 4, 5, 6 |
+| Session Complete | <img width="150" alt="Session Complete" src="https://github.com/user-attachments/assets/1eaabad5-b1d0-4781-810e-c2e1966662bf" /> | Must Have 7, 8, 10 (coins earned, outcome, summary) |
+| Shop | <img width="150" alt="Shop" src="https://github.com/user-attachments/assets/26fbf6d8-7cc6-4935-8273-0be1bbb42e6a" /> | Must Have 9 (spend coins on hats, screens and effects) |
+
+
 # FocusRobot: Components, Classes, and Database Design
 
 **Tech stack:** MySQL 8 (database)

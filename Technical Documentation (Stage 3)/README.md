@@ -341,7 +341,7 @@ CREATE TABLE purchases (
 sequenceDiagram
     actor User
     participant App as Mobile App
-    participant Backend as FastAPI Backend
+    participant Backend as Spring Boot Backend
     participant DB as MySQL Database
     participant Robot as Robot
 
@@ -359,7 +359,7 @@ sequenceDiagram
     participant Camera
     participant Robot as  Robot
     participant CV as OpenCV / MediaPipe
-    participant Backend as FastAPI Backend
+    participant Backend as Spring Boot Backend
     participant DB as MySQL Database
     participant App as Mobile App
     participant Screen as Robot Display
@@ -388,7 +388,7 @@ sequenceDiagram
 sequenceDiagram
     actor User
     participant App as Mobile App
-    participant Backend as FastAPI Backend
+    participant Backend as Spring Boot Backend
     participant DB as MySQL Database
 
     User->>App: Complete focus session

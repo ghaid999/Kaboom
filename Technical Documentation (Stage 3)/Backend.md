@@ -1,8 +1,7 @@
 #  Kaboom: Components, Classes, and Database Design
  
-This document describes the back-end classes, the database design, and the main front-end components of the FocusRobot system. FocusRobot is a physical robot named Sparky, paired with a mobile app, that helps users stay focused during study or work sessions.
+This document describes the back-end classes, the database design, and the main front-end components of the Kaboom system. kaboom is a physical robot named Sparky, paired with a mobile app, that helps users stay focused during study or work sessions.
  
-**Technology stack:** Spring Boot (backend), Flutter (mobile app), MySQL(database).
  
 ## Table of Contents
  
@@ -12,7 +11,7 @@ This document describes the back-end classes, the database design, and the main 
 4. [Database Schema (MySQL 8)](#4-database-schema-mysql-8)
 5. [Implementation Notes (Spring Boot)](#5-implementation-notes-spring-boot)
 6. [Front-end Components](#6-front-end-components)
-7. [Points to Confirm](#7-points-to-confirm)
+
 ---
  
 ## 1. Class Diagram
@@ -32,7 +31,7 @@ classDiagram
         +update() bool
         +delete() bool
         +addReward(amount) void
-        +buy(productIds) bool
+        +buy(productId) bool
         +equip(productId) bool
     }
  
@@ -97,15 +96,9 @@ classDiagram
     class Purchase {
         +int id
         +int userId
-        +int totalPrice
-        +datetime purchasedAt
-    }
- 
-    class PurchaseItem {
-        +int id
-        +int purchaseId
         +int productId
         +int pricePaid
+        +datetime purchasedAt
         +bool isEquipped
     }
  
@@ -117,8 +110,7 @@ classDiagram
     Robot "1" --> "1" ComputerVision : uses
     ComputerVision ..> StateLog : provides state
     User "1" --> "0..*" Purchase : makes
-    Purchase "1" --> "1..*" PurchaseItem : contains
-    Product "1" --> "0..*" PurchaseItem : appears in
+    Purchase "0..*" --> "1" Product : for
     Admin ..> Product : manages
     User ..> Purchase : creates via buy
 ```
@@ -150,7 +142,7 @@ classDiagram
 | `update()` | bool | Updates the account information (name, email, or password). |
 | `delete()` | bool | Deletes the account together with its robot, sessions, and purchases. |
 | `addReward(amount)` | void | Adds the given number of coins to the user's balance. It is called when a focus session ends. |
-| `buy(productIds)` | bool | Buys one or more products. It checks that every product is available and not already owned by the user, and that the balance covers the total price. Then it deducts the coins and creates a `Purchase` with one `PurchaseItem` for each product. All of these steps happen in a single transaction, so either everything succeeds or nothing changes. Returns `false` if the balance is not enough or a product cannot be bought. |
+| `buy(productId)` | bool | Buys one product. It checks that the product is available and not already owned by the user, and that the balance covers the price. Then it deducts the coins and creates a `Purchase`. All of these steps happen in a single transaction, so either everything succeeds or nothing changes. Returns `false` if the balance is not enough or the product cannot be bought. |
 | `equip(productId)` | bool | Equips a product that the user owns, so that it appears on the robot. Only one product per category can be equipped at a time, so any other equipped product of the same category is unequipped. Returns `false` if the user does not own the product. |
  
 **Relationships:** A user owns at most one robot, starts many focus sessions, and makes many purchases. `Admin` inherits from `User`.
@@ -168,8 +160,6 @@ classDiagram
 | `addProduct(product)` | bool | Adds a new product to the shop, with its name, category, price, and description. Only the admin can call this method. |
  
 **Relationships:** Inherits from `User`. Manages `Product`.
- 
-**Note:** The database guarantees that only one admin can exist .
  
 ---
  
@@ -203,7 +193,7 @@ classDiagram
 | `calculateReward()` | int | Calculates the number of coins earned, based on the reward rule defined by the team. |
 | `sessionSummary()` | dict | Returns the summary shown to the user: the focused time, and the coins earned. |
  
-**Focus percentage formula:**
+
  
 ```
 ```
@@ -298,13 +288,13 @@ classDiagram
 |---|---|---|
 | `getProducts(category)` | list | A static method that returns all available products to show in the shop. If a category is given, it returns only the products of that category. |
  
-**Relationships:** Added and managed by `Admin`. Appears in many `PurchaseItem` records.
+**Relationships:** Added and managed by `Admin`. Appears in many `Purchase` records.
  
 ---
  
 ### 2.8 Purchase
  
-**Purpose:** Represents one purchase made by a user. A single purchase can include several products. The products themselves are stored in `PurchaseItem`.
+**Purpose:** Represents one purchase made by a user. Each purchase is for exactly one product. It stores the price paid, so the purchase history stays correct even if the product price changes later. It also records whether the user has equipped the product on the robot, which is shown as "Equipped" in the shop.
  
 **Stored in table:** `purchases`
  
@@ -312,28 +302,12 @@ classDiagram
 |---|---|---|
 | `id` | int | Unique identifier of the purchase. |
 | `userId` | int | The user who made the purchase. |
-| `totalPrice` | int | The total number of coins paid for the whole purchase. |
-| `purchasedAt` | datetime | When the purchase was made. |
- 
-**Relationships:** Belongs to one user. Contains one or more `PurchaseItem` records.
- 
----
- 
-### 2.9 PurchaseItem
- 
-**Purpose:** Links a purchase to a product. It exists because the relationship between purchases and products is many-to-many: one purchase can include many products, and one product can appear in many purchases. It also stores the price paid, so the purchase history stays correct even if the product price changes later. 
- 
-**Stored in table:** `purchase_items`
- 
-| Attribute | Type | Description |
-|---|---|---|
-| `id` | int | Unique identifier of the item. |
-| `purchaseId` | int | The purchase that this item belongs to. |
 | `productId` | int | The product that was bought. |
 | `pricePaid` | int | The price of the product at the time of the purchase. |
+| `purchasedAt` | datetime | When the purchase was made. |
 | `isEquipped` | bool | Whether the user has currently equipped this product on the robot. The default is `false`. |
  
-**Relationships:** Belongs to one `Purchase` and one `Product`.
+**Relationships:** Belongs to one user. Is for one `Product`.
  
 ---
  
@@ -346,8 +320,7 @@ erDiagram
     ROBOTS ||--o{ FOCUS_SESSIONS : runs
     FOCUS_SESSIONS ||--o{ STATE_LOGS : has
     USERS ||--o{ PURCHASES : makes
-    PURCHASES ||--|{ PURCHASE_ITEMS : contains
-    PRODUCTS ||--o{ PURCHASE_ITEMS : "bought in"
+    PRODUCTS ||--o{ PURCHASES : "bought in"
  
     USERS {
         int id PK
@@ -402,15 +375,9 @@ erDiagram
     PURCHASES {
         int id PK
         int user_id FK
-        int total_price
-        datetime purchased_at
-    }
- 
-    PURCHASE_ITEMS {
-        int id PK
-        int purchase_id FK
         int product_id FK
         int price_paid
+        datetime purchased_at
         boolean is_equipped
     }
 ```
@@ -432,9 +399,7 @@ erDiagram
 | Robot 0..1 : N FocusSession | A session can use one robot, or none. |
 | FocusSession 1 : N StateLog | A session records many state changes. |
 | User 1 : N Purchase | A user can make many purchases. |
-| Purchase 1 : N PurchaseItem | A purchase contains one or more items. |
-| Product 1 : N PurchaseItem | A product can appear in many purchases. |
-| Purchase M : N Product | Resolved through the `purchase_items` table. |
+| Purchase N : 1 Product | Each purchase is for one product, and a product can appear in many purchases. |
  
 ---
  
@@ -501,19 +466,12 @@ CREATE TABLE products (
 CREATE TABLE purchases (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    total_price INT NOT NULL,
-    purchased_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
- 
-CREATE TABLE purchase_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    purchase_id INT NOT NULL,
     product_id INT NOT NULL,
     price_paid INT NOT NULL,
+    purchased_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_equipped BOOLEAN NOT NULL DEFAULT FALSE,
-    UNIQUE KEY uq_purchase_product (purchase_id, product_id),
-    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_user_product (user_id, product_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 ```

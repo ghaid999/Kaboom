@@ -1,4 +1,4 @@
-# FocusRobot — Technical Documentation
+# Kaboom! — Technical Documentation
 
 ## Table of Contents
 
@@ -80,7 +80,7 @@
 
 ### Mockups
 
-Interactive Figma prototype: [FocusRobot (Kaboom) Mockups](https://www.figma.com/design/av0ip8R6icJggihhZaXFMo/Kaboom-?node-id=1-3&p=f&t=6P1tw5wPOf7ddRQe-0)
+Interactive Figma prototype: [Kaboom! (Kaboom) Mockups](https://www.figma.com/design/av0ip8R6icJggihhZaXFMo/Kaboom-?node-id=1-3&p=f&t=6P1tw5wPOf7ddRQe-0)
 
 #### Mockup overview
 

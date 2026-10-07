@@ -1,5 +1,33 @@
 # FocusRobot — Technical Documentation
 
+## Table of Contents
+
+1. [User Stories and Mockups](#1-user-stories-and-mockups)
+   - [User Stories (MoSCoW)](#user-stories-moscow)
+   - [Mockups](#mockups)
+2. [System Architecture](#1-system-architecture)
+3. [Class Diagram](#2-class-diagram)
+4. [ER Diagram](#3-er-diagram)
+5. [Database Schema (MySQL 8)](#4-database-schema-mysql-8)
+6. [API Mapping](#4-api-mapping)
+7. [API Specifications](#5-api-specifications)
+   - [API Style and Authentication](#51-api-style-and-authentication)
+   - [External APIs and Local Technology Integrations](#52-external-apis-and-local-technology-integrations)
+   - [Robot Pairing and Device Access](#53-robot-pairing-and-device-access)
+   - [Internal API Endpoint Contracts](#54-internal-api-endpoint-contracts)
+   - [Key Request and Response Examples](#55-key-request-and-response-examples)
+   - [Session and Reward Rules](#56-session-and-reward-rules)
+   - [Live Updates](#57-live-updates)
+   - [Error Response Format](#58-error-response-format)
+   - [Database Alignment Required for These Endpoints](#59-database-alignment-required-for-these-endpoints)
+8. [SCM and QA Plan](#6-scm-and-qa-plan)
+   - [Source Control Management](#61-source-control-management)
+   - [QA Strategy](#62-qa-strategy)
+   - [Detection Accuracy Evaluation](#63-detection-accuracy-evaluation)
+   - [Critical Test Scenarios](#64-critical-test-scenarios)
+   - [Continuous Integration and Deployment](#65-continuous-integration-and-deployment)
+   - [Technical Justification](#66-technical-justification)
+
 ## 1. User Stories and Mockups
 
 ### User Stories (MoSCoW)
@@ -68,22 +96,10 @@ Interactive Figma prototype: [FocusRobot (Kaboom) Mockups](https://www.figma.com
 | Shop | <img width="150" alt="Shop" src="https://github.com/user-attachments/assets/26fbf6d8-7cc6-4935-8273-0be1bbb42e6a" /> | Must Have 9 (spend coins on hats, screens and effects) |
 
 
-# FocusRobot: Components, Classes, and Database Design
+## 2. System Architecture
 
 **Tech stack:** MySQL 8 (database)
 
----
-
-## Table of Contents
-
-1. [System Architecture](#1-system-architecture)
-2. [Class Diagram](#2-class-diagram)
-3. [ER Diagram](#3-er-diagram)
-4. [Database Schema (MySQL 8)](#4-database-schema-mysql-8)
-
-
----
-## 1. System Architecture
 
 ```mermaid
 flowchart TB
@@ -113,7 +129,9 @@ flowchart TB
     Pi -->|"expression"| Screen
 ```
 
-## 2. Class Diagram
+## 3. Components, Classes, and Database Design
+
+### Class Diagram
 
 ```mermaid
 classDiagram
@@ -211,7 +229,7 @@ classDiagram
 
 ---
 
-## 3. ER Diagram
+### ER Diagram
 
 ```mermaid
 erDiagram
@@ -289,7 +307,7 @@ erDiagram
 
 ---
 
-## 4. Database Schema (MySQL 8)
+### Database Schema (MySQL 8)
 
 Create the tables in this order because of the foreign keys.
 
@@ -357,6 +375,8 @@ CREATE TABLE purchases (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 ```
+## 4. Sequence Diagrams
+
 ```mermaid
 sequenceDiagram
     actor User
@@ -423,7 +443,7 @@ sequenceDiagram
 
 ---
 
-## 4. API Mapping
+## 5. API Specifications
 
 | Action | Endpoint |
 |---|---|
@@ -435,3 +455,400 @@ sequenceDiagram
 | History and summary | `GET /sessions`, `GET /sessions/{id}` |
 | Products | `GET /products`, `POST /products` (admin) |
 | Purchase | `POST /purchases` |
+
+### 5.1 API Style and Authentication
+
+Kaboom! uses a REST API built with Spring Boot. REST endpoints use JSON request and response bodies over HTTPS. The Flutter mobile app and Raspberry Pi communicate with the Spring Boot backend. The Raspberry Pi does not communicate directly with the Flutter app.
+
+REST base path:
+
+```text
+/api/v1
+```
+
+User endpoints require a user JWT access token:
+
+```text
+Authorization: Bearer <user_access_token>
+```
+
+The Raspberry Pi is a device, not a user. It receives a device JWT during pairing. A device JWT contains a `robotId` claim and can only submit data for that robot.
+
+### 5.2 External APIs and Local Technology Integrations
+
+The MVP uses no third party cloud API.
+
+The following local technologies are used on the Raspberry Pi:
+
+| Technology | Purpose | Reason for selection |
+| --- | --- | --- |
+| OpenCV | Capture and process camera frames | Reliable computer vision support for Raspberry Pi. |
+| MediaPipe | Detect face and eye landmarks | Efficient prebuilt models for focus related behavior detection. |
+| STOMP over WebSocket | Send live backend updates to Flutter | Supported by Spring Boot and suitable for authenticated live updates. |
+
+Camera frames are processed on the Raspberry Pi and are not stored in the backend. The Pi sends only the detected state and its metadata.
+
+The Pi sends one event when the state changes and sends a heartbeat every 30 seconds during an active session. It does not send one request for every camera frame.
+
+### 5.3 Robot Pairing and Device Access
+
+1. An authenticated user creates a temporary pairing code.
+2. The user enters the pairing code into the Raspberry Pi setup screen.
+3. The Pi pairs with the Spring Boot backend using its serial number and pairing code.
+4. The backend returns a robot identifier, device access token, and device refresh token.
+5. The Pi stores its tokens securely and uses the device access token for robot endpoints.
+
+Pairing code endpoint:
+
+```text
+POST /api/v1/robots/pairing-codes
+```
+
+Robot pairing endpoint:
+
+```text
+POST /api/v1/robots/pair
+```
+
+A pairing code can be used once and expires after ten minutes. If a device token does not match the robot identifier in the URL, the backend returns `403 Forbidden`.
+
+### 5.4 Internal API Endpoint Contracts
+
+#### Authentication and User Endpoints
+
+| Method and path | Access | Input JSON | Output JSON |
+| --- | --- | --- | --- |
+| `POST /auth/register` | Public | `name`, `email`, `password` | `message`, `user` |
+| `POST /auth/login` | Public | `email`, `password` | `accessToken`, `refreshToken`, `expiresInSeconds`, `user` |
+| `POST /auth/refresh` | Refresh token | `refreshToken` | `accessToken`, `expiresInSeconds` |
+| `POST /auth/logout` | User or device token | `refreshToken` | `message` |
+| `GET /users/me` | User JWT | None | `id`, `name`, `email`, `coins`, `role` |
+| `PUT /users/me` | User JWT | Optional `name`, `email`, `password` | Updated `user` |
+| `DELETE /users/me` | User JWT | None | `message` |
+
+#### Robot Endpoints
+
+| Method and path | Access | Input JSON or query | Output JSON |
+| --- | --- | --- | --- |
+| `POST /robots/pairing-codes` | User JWT | None | `pairingCode`, `expiresAt` |
+| `POST /robots/pair` | Valid pairing code | `serialNumber`, `pairingCode` | `robotId`, `deviceAccessToken`, `deviceRefreshToken`, `expiresInSeconds` |
+| `GET /robots/me` | User JWT | None | `id`, `currentExpression`, `connectionState` |
+| `GET /robots/me/active-session` | Device JWT | None | `sessionId`, `plannedDurationSeconds`, `startTime`, `status`; or `204 No Content` |
+| `POST /robots/{robotId}/focus-states` | Device JWT with matching robot claim | `sessionId`, `state`, `timestamp`, `sequenceNumber`, `eventType` | `message`, `robotExpression`, `acceptedSequenceNumber` |
+| `POST /robots/{robotId}/disconnect` | User JWT and owner check | None | `message` |
+
+The Pi checks `GET /robots/me/active-session` every five seconds. A returned active session starts local monitoring. A `204 No Content` response means no session is active.
+
+The `focus-states` endpoint accepts `STATE_CHANGE` or `HEARTBEAT` values for `eventType`. `state` must be `FOCUSED`, `DISTRACTED`, or `AWAY`.
+
+#### Focus Session Endpoints
+
+| Method and path | Access | Input JSON or query | Output JSON |
+| --- | --- | --- | --- |
+| `POST /sessions` | User JWT | `robotId`, `plannedDurationSeconds` | `id`, `robotId`, `plannedDurationSeconds`, `startTime`, `status` |
+| `PATCH /sessions/{id}/pause` | User JWT and owner check | None | Updated session `status` |
+| `PATCH /sessions/{id}/resume` | User JWT and owner check | None | Updated session `status` |
+| `PATCH /sessions/{id}/end` | User JWT and owner check | None | `status`, `durationSeconds`, `focusedPercentage`, `rewardEarned`, `totalCoins` |
+| `GET /sessions?page=0&size=20&sort=startTime,desc` | User JWT | Pagination query parameters | `content`, `page`, `size`, `totalElements`, `totalPages` |
+| `GET /sessions/{id}` | User JWT and owner check | None | Session summary and state statistics |
+
+#### Store and Purchase Endpoints
+
+| Method and path | Access | Input JSON or query | Output JSON |
+| --- | --- | --- | --- |
+| `GET /products` | User JWT | None | Available product list |
+| `POST /products` | Admin JWT only | `name`, `price`, optional `description` | Created product |
+| `POST /purchases` | User JWT | `productId` | `purchase`, `remainingCoins` |
+| `GET /purchases?page=0&size=20` | User JWT | Pagination query parameters | Paginated purchase history |
+| `GET /users/me/items` | User JWT | None | Previously purchased products |
+
+`POST /products` checks the existing `role` field. Only a user with `role = admin` can create a product. All other users receive `403 Forbidden`.
+
+### 5.5 Key Request and Response Examples
+
+#### Log in
+
+```text
+POST /api/v1/auth/login
+```
+
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123"
+}
+```
+
+```json
+{
+  "accessToken": "user_access_token",
+  "refreshToken": "user_refresh_token",
+  "tokenType": "Bearer",
+  "expiresInSeconds": 900,
+  "user": {
+    "id": 1,
+    "name": "Example User",
+    "coins": 120,
+    "role": "user"
+  }
+}
+```
+
+#### Pair a robot
+
+```text
+POST /api/v1/robots/pair
+```
+
+```json
+{
+  "serialNumber": "KABOOM-PI-001",
+  "pairingCode": "483921"
+}
+```
+
+```json
+{
+  "robotId": 1,
+  "deviceAccessToken": "device_access_token",
+  "deviceRefreshToken": "device_refresh_token",
+  "expiresInSeconds": 900
+}
+```
+
+#### Start a focus session
+
+```text
+POST /api/v1/sessions
+```
+
+```json
+{
+  "robotId": 1,
+  "plannedDurationSeconds": 1800
+}
+```
+
+```json
+{
+  "id": 25,
+  "robotId": 1,
+  "plannedDurationSeconds": 1800,
+  "startTime": "2026-10-07T14:00:00Z",
+  "status": "active"
+}
+```
+
+#### Send a focus state from the Raspberry Pi
+
+```text
+POST /api/v1/robots/1/focus-states
+```
+
+```json
+{
+  "sessionId": 25,
+  "state": "FOCUSED",
+  "timestamp": "2026-10-07T14:05:30Z",
+  "sequenceNumber": 42,
+  "eventType": "STATE_CHANGE"
+}
+```
+
+```json
+{
+  "message": "Focus state recorded successfully",
+  "robotExpression": "happy",
+  "acceptedSequenceNumber": 42
+}
+```
+
+#### End a focus session
+
+```text
+PATCH /api/v1/sessions/25/end
+```
+
+```json
+{
+  "id": 25,
+  "status": "completed",
+  "durationSeconds": 1800,
+  "focusedPercentage": 88.5,
+  "rewardEarned": 26,
+  "totalCoins": 146
+}
+```
+
+### 5.6 Session and Reward Rules
+
+1. A user may have only one active or paused focus session. Starting another session returns `409 Conflict`.
+2. Only an active session can be paused. Pausing an already paused or completed session returns `409 Conflict`.
+3. Only a paused session can be resumed. Resuming an active or completed session returns `409 Conflict`.
+4. Only an active or paused session can be ended. Ending an already completed session returns `409 Conflict`.
+5. A user can access only their own sessions. An attempt to access another user session returns `404 Not Found`.
+
+The Spring Boot backend calculates rewards. The Flutter app and Raspberry Pi never calculate or submit a reward amount.
+
+```text
+rewardEarned = min(30, floor(focusedDurationSeconds / 60))
+```
+
+The backend derives `focusedDurationSeconds` from timestamped state intervals. Paused time does not count. Sessions shorter than 60 seconds earn zero coins. The maximum reward per session is 30 coins.
+
+For a 30 minute session with 88.5 percent focus, the user has approximately 1,593 focused seconds and earns 26 coins.
+
+### 5.7 Live Updates
+
+Spring Boot is the STOMP over WebSocket server. The Pi posts states to the REST API. The backend publishes live session updates to Flutter.
+
+The Flutter app connects to:
+
+```text
+/ws
+```
+
+The app supplies its user JWT in the STOMP `CONNECT` header. Spring Security validates the token. The app subscribes to its own session updates only:
+
+```text
+/user/queue/sessions/{sessionId}
+```
+
+The backend verifies that the authenticated user owns the session before allowing the subscription or publishing updates.
+
+### 5.8 Error Response Format
+
+```json
+{
+  "timestamp": "2026-10-07T14:10:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "path": "/api/v1/sessions",
+  "fieldErrors": [
+    {
+      "field": "plannedDurationSeconds",
+      "message": "must be greater than zero"
+    }
+  ]
+}
+```
+
+Common status codes are `200` for success, `201` for creation, `204` for no active session, `400` for invalid input, `401` for missing or invalid authentication, `403` for insufficient permission, `404` for unavailable resources, `409` for conflicts, and `500` for unexpected server errors.
+
+### 5.9 Database Alignment Required for These Endpoints
+
+The existing Stage 3 schema already includes `users`, `robots`, `focus_sessions`, `state_logs`, `products`, and `purchases`. To fully support the API contracts above, the database design owner must add the following before implementation:
+
+1. A unique `serial_number` field in `robots` for device pairing.
+2. A `pairing_codes` table containing code, user identifier, expiration time, and used status.
+3. A `refresh_tokens` table containing a hashed token, token type, owner identifier, expiry time, and revocation status.
+4. `sequence_number` and `event_type` fields in `state_logs`.
+5. A uniqueness rule for `session_id` and `sequence_number` in `state_logs` to prevent duplicate buffered events.
+
+These additions support the same existing project scope and do not change the core entity relationships.
+
+## 6. SCM and QA Plan
+
+### 6.1 Source Control Management
+
+The team uses Git and GitHub.
+
+| Branch | Purpose |
+| --- | --- |
+| `main` | Stable release ready code only. |
+| `develop` | Shared integration branch. |
+| `feature/<feature-name>` | New feature development. |
+| `fix/<issue-name>` | Bug fixes. |
+| `docs/<topic>` | Documentation changes. |
+
+Examples:
+
+```text
+feature/user-authentication
+feature/focus-session-api
+feature/robot-state-detection
+feature/flutter-session-screen
+fix/coin-calculation
+docs/api-specifications
+```
+
+Each contributor creates a branch from `develop`, makes focused commits, and opens a pull request to `develop`. At least one teammate must approve the pull request before merge.
+
+At a release milestone, the team creates a release pull request from `develop` to `main`. It requires passing CI checks, one approval, and a successful final demo smoke test.
+
+`main` and `develop` are protected branches. Direct pushes are disabled. Pull requests require passing checks and one approval.
+
+### 6.2 QA Strategy
+
+| Test area | Tool or method | Coverage |
+| --- | --- | --- |
+| Backend unit tests | JUnit 5 and Mockito | Reward calculation, pairing expiry, session rules, and authorization. |
+| Backend integration tests | Spring Boot Test with MySQL compatible test database | Authentication, endpoint contracts, and database persistence. |
+| API tests | Postman | Inputs, outputs, validation, authentication, and error responses. |
+| Flutter tests | Flutter test framework | Timer logic, state management, and user interface widgets. |
+| Pi unit tests | Pytest | State filtering, heartbeat timing, buffering, and sequence numbering. |
+| Pi linting | Ruff or Flake8 | Python style and common errors. |
+| Hardware tests | Raspberry Pi, camera, and display | Detection state, connection, and robot expressions. |
+| End to end tests | Manual scenario checklist | Login, focus session, reward, and purchase flow. |
+
+### 6.3 Detection Accuracy Evaluation
+
+Stage 2 requires at least 80 percent correct focus detection across five users. The team will evaluate that goal using the following test matrix. Each condition is tested at least three times per user and recorded as correct or incorrect.
+
+| Condition | Test cases | Expected outcome |
+| --- | --- | --- |
+| Lighting | Bright indoor, dim, side light | Stable state or reduced confidence. |
+| Glasses | With and without glasses | Face and eye detection works where possible. |
+| Head angle | Forward, left, right, downward | Short natural movements are not classified as away. |
+| Distance | Near, normal desk distance, far | System identifies when the user is outside reliable camera range. |
+| Focus state | Focused, distracted, away | Displayed state matches observed behavior. |
+
+The MVP does not claim medical grade attention or sleep detection.
+
+### 6.4 Critical Test Scenarios
+
+1. Valid registration creates an account.
+2. Existing email registration returns `409 Conflict`.
+3. Valid login returns access and refresh tokens.
+4. Expired or invalid token returns `401 Unauthorized`.
+5. Starting a second active session returns `409 Conflict`.
+6. Pausing an already paused session returns `409 Conflict`.
+7. Ending an already completed session returns `409 Conflict`.
+8. Accessing another user session returns `404 Not Found`.
+9. Invalid fields return `400 Bad Request` with `fieldErrors`.
+10. A device may submit focus states only for its own robot.
+11. Duplicate buffered events create only one state log.
+12. Focused, distracted, and away states update the robot expression correctly.
+13. The server calculates focus percentage and coins correctly.
+14. Concurrent purchases cannot spend more coins than the user owns.
+15. A nonadmin cannot create products and receives `403 Forbidden`.
+16. The Pi buffers and resubmits events after a network dropout.
+
+### 6.5 Continuous Integration and Deployment
+
+GitHub Actions runs on every pull request to `develop` and `main`.
+
+1. Build the Spring Boot backend.
+2. Run backend unit and integration tests.
+3. Run Flutter tests.
+4. Run Python linting and Pytest for Raspberry Pi logic.
+5. Run formatting and static analysis checks.
+6. Report whether the pull request can merge.
+
+Local development runs on each team member machine. Staging runs Spring Boot and MySQL in Docker services for integration and Raspberry Pi hardware testing. The production demo uses the stable final release.
+
+Database credentials, JWT signing keys, and deployment credentials are stored in GitHub Environment secrets and deployment environment variables. They are never committed to the repository or mobile application source code.
+
+## 7. Technical Justifications
+
+Spring Boot provides structured REST APIs, STOMP WebSocket support, Spring Security, validation, testing, and MySQL integration.
+
+MySQL fits the existing project because it stores structured related data: users, robots, focus sessions, state logs, products, and purchases.
+
+Device tokens and time limited pairing codes protect the system because the Raspberry Pi is a device, not a user. They prevent one robot from submitting events for another robot.
+
+Feature branches, pull requests, and branch protection prevent unreviewed code from reaching the stable release.
+
+Automated and manual hardware tests are required because Kaboom! includes a mobile app, backend, database, Raspberry Pi, camera, and physical robot.
+

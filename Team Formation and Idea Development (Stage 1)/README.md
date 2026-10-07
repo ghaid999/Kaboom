@@ -2,7 +2,7 @@
 
 ## Team Formation and Idea Development
 
-### Project: FocusRobot
+### Project: Kaboom!
 
 **Team Members:** Shahd, Gheed, Lama, Noura
 
@@ -63,10 +63,10 @@ We used the following brainstorming approaches:
 
 | **Idea** | **Description** | **Strengths** | **Weaknesses / Challenges** | **Decision** | **Reason for Decision** |
 |---|---|---|---|---|---|
-| **FocusRobot** | A physical robot paired with a mobile app that helps users maintain focus during study or work sessions. The robot uses a camera and Computer Vision to monitor focus-related behaviors and provides feedback and rewards. | Combines Computer Vision, mobile development, hardware, and gamification. It provides an opportunity to build a physical prototype and has potential for future expansion. | Computer Vision accuracy, hardware integration, privacy concerns, and limited development time. | **Selected** | The idea combines current technologies such as AI, Computer Vision, and robotics. It also provides a challenging project that allows the team to learn new technologies and build a physical prototype. |
+| **Kaboom!** | A physical robot paired with a mobile app that helps users maintain focus during study or work sessions. The robot uses a camera and Computer Vision to monitor focus-related behaviors and provides feedback and rewards. | Combines Computer Vision, mobile development, hardware, and gamification. It provides an opportunity to build a physical prototype and has potential for future expansion. | Computer Vision accuracy, hardware integration, privacy concerns, and limited development time. | **Selected** | The idea combines current technologies such as AI, Computer Vision, and robotics. It also provides a challenging project that allows the team to learn new technologies and build a physical prototype. |
 | **ArSL** | A real-time Arabic Sign Language interpreter for meetings that converts spoken language into Arabic Sign Language. | Addresses an important accessibility problem and has potential social impact. | Integration with existing meeting platforms such as Zoom, Teams, and Meet could create adoption and technical challenges. | Rejected | Similar solutions already exist, which makes it more difficult for the project to provide a sufficiently different or unique solution. |
 | **Masar** | A platform for discovering activities in Saudi Arabia and creating personalized itineraries based on user preferences. | Useful for people looking for activities, potentially budget-friendly, and can provide personalized recommendations. | Similar platforms and services already exist, making differentiation more difficult. | Rejected | Similar platforms and services already exist, so the team felt it would be difficult to provide enough differentiation from existing solutions. |
-| **Hackathon Platform** | A platform for discovering hackathons and finding suitable teammates based on skills and interests. | Useful for students and developers interested in hackathons and could include team matching. | Finding reliable and consistent hackathon data and building a useful matching system within the project timeline could be challenging. | Rejected | The idea was considered feasible, but the team preferred FocusRobot because it is more challenging and provides more opportunities to explore hardware, AI, and robotics. |
+| **Hackathon Platform** | A platform for discovering hackathons and finding suitable teammates based on skills and interests. | Useful for students and developers interested in hackathons and could include team matching. | Finding reliable and consistent hackathon data and building a useful matching system within the project timeline could be challenging. | Rejected | The idea was considered feasible, but the team preferred Kaboom! because it is more challenging and provides more opportunities to explore hardware, AI, and robotics. |
 | **Team-Based Word Game** | A multiplayer team-vs-team Arabic word game inspired by category-based games. Players compete in teams by answering word or knowledge challenges under time limits, with different rounds and scoring mechanics. | Simple and engaging concept, suitable for multiplayer, encourages teamwork and competition, and can be expanded with different game modes and challenges. | Similar word and category games already exist, making differentiation more difficult. Multiplayer synchronization and game balancing would also add development complexity. | Rejected | The idea was considered too simple compared with the team's goal of building a more challenging project that allows them to learn and apply new technologies. |
 
 # 3. Idea Evaluation
@@ -88,7 +88,7 @@ Each criterion was scored from 1 to 5.
 
 | Idea               | Feasibility | Prototypable | Data / Tools Available | Technical Challenge | Real Problem | Scalability | Total |
 | ------------------ | ----------: | -----------: | ---------------------: | ------------------: | -----------: | ----------: | ----: |
-| FocusRobot         |           3 |            5 |                      4 |                   5 |            5 |           5 | **27** |
+| Kaboom!         |           3 |            5 |                      4 |                   5 |            5 |           5 | **27** |
 | ArSL               |           3 |            3 |                      4 |                   5 |            4 |           4 | **23** |
 | Masar              |           4 |            5 |                      4 |                   3 |            3 |           4 | **23** |
 | Hackathon Platform |           3 |            5 |                      2 |                   4 |            4 |           4 | **22** |
@@ -102,9 +102,9 @@ Each criterion was scored from 1 to 5.
 
 ## 4.1 MVP Summary
 
-### FocusRobot
+### Kaboom!
 
-FocusRobot is a **physical desktop robot paired with a mobile application** designed to help users maintain focus during study or work sessions.
+Kaboom! is a **physical desktop robot paired with a mobile application** designed to help users maintain focus during study or work sessions.
 
 The user starts a focus session through the application and selects a target duration. During the session, the robot uses a camera and Computer Vision techniques to detect focus-related behaviors such as face presence, eye state, and head orientation.
 
@@ -174,7 +174,7 @@ Additional features such as phone detection, yawning detection, or detecting ano
 
 # 5. Why We Chose This MVP
 
-We selected FocusRobot because it combines several areas that our team wants to learn and practice, including Computer Vision, mobile application development, backend development, databases, hardware integration, and 3D printing.
+We selected Kaboom! because it combines several areas that our team wants to learn and practice, including Computer Vision, mobile application development, backend development, databases, hardware integration, and 3D printing.
 
 The project also allows us to create a physical prototype that can be demonstrated during the final presentation rather than building only a software interface.
 
@@ -203,7 +203,7 @@ The idea also addresses a problem that is relevant to our target users: maintain
 
 After brainstorming and researching multiple ideas, the team compared the ideas based on feasibility, prototyping potential, available tools and data, technical challenge, problem relevance, and scalability.
 
-FocusRobot was selected because it provides a clear MVP that can be demonstrated physically while allowing the team to work across multiple technical areas.
+Kaboom! was selected because it provides a clear MVP that can be demonstrated physically while allowing the team to work across multiple technical areas.
 
 The team also considered the project's development timeline and decided to control the scope by starting with a simple physical robot and a limited Computer Vision system.
 
@@ -246,7 +246,7 @@ The MVP will **not** initially include complex robot movement, advanced conversa
 
 Stage 1 established the team's initial roles, collaboration strategy, brainstorming process, evaluated ideas, and selected MVP.
 
-The team selected FocusRobot as a project that combines software, Computer Vision, hardware, and gamification while addressing the problem of maintaining focus during study and work.
+The team selected Kaboom! as a project that combines software, Computer Vision, hardware, and gamification while addressing the problem of maintaining focus during study and work.
 
 The next stage will focus on validating the problem, defining detailed requirements, and creating the technical plan needed to begin development.
 

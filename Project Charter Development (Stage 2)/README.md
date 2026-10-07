@@ -1,10 +1,10 @@
-# FocusRobot — Project Charter
+# Kaboom! — Project Charter
 
 ## 1. Project Objectives
 
 ### Project Purpose
 
-FocusRobot is a physical robot paired with a mobile application that helps people maintain focus during study or work sessions. The robot uses a camera and Computer Vision to detect focus-related behaviors and provides real-time feedback. Users can also earn rewards for completing focus sessions.
+Kaboom! is a physical robot paired with a mobile application that helps people maintain focus during study or work sessions. The robot uses a camera and Computer Vision to detect focus-related behaviors and provides real-time feedback. Users can also earn rewards for completing focus sessions.
 
 The project aims to combine Computer Vision, mobile development, hardware, and gamification into a practical prototype that can help users build better focus habits.
 
@@ -24,7 +24,7 @@ The project aims to combine Computer Vision, mobile development, hardware, and g
 
 | Stakeholder | Type | Role / Interest |
 |---|---|---|
-| Project Team | Internal | Designs, develops, tests, and documents the FocusRobot MVP. |
+| Project Team | Internal | Designs, develops, tests, and documents the Kaboom! MVP. |
 | Mentor | External | Provides guidance and evaluates the project based on the project requirements and deliverables. |
 | Users | External | Students, employees, and other people who want to improve their focus. They provide feedback about the usability and usefulness of the system. |
 
@@ -100,14 +100,14 @@ The project will be completed over **12 weeks** across five stages, following th
 
 | Week        | Stage                                          | Main Activities / Deliverables                                                                                              |
 | ----------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Week 1**  | **Stage 1: Team Formation & Idea Development** | Form the team, discuss and evaluate project ideas, select the FocusRobot concept, and define the initial MVP.               |
+| **Week 1**  | **Stage 1: Team Formation & Idea Development** | Form the team, discuss and evaluate project ideas, select the Kaboom! concept, and define the initial MVP.               |
 | **Week 2**  | **Stage 2: Project Charter Development**       | Define project objectives, stakeholders and roles, scope, risks and mitigation strategies, and the high-level project plan. |
 | **Week 3**  | **Stage 3: Technical Documentation**           | Create user stories, Figma mockups, high-level system architecture, and database design.                                    |
 | **Week 4**  | **Stage 3: Technical Documentation**           | Create sequence diagrams, API specifications, SCM and QA plans, and document technical justifications.                      |
 | **Week 5**  | **Stage 4: MVP Development & Execution**       | Set up the frontend, backend, database, GitHub repositories, project management board, and deployment. Begin development.   |
 | **Week 6**  | **Stage 4: MVP Development & Execution**       | Complete authentication and the main/home screen functionality where applicable.                                            |
-| **Week 7**  | **Stage 4: MVP Development & Execution**       | Complete approximately 50% of the main FocusRobot feature.                                                                  |
-| **Week 8**  | **Stage 4: MVP Development & Execution**       | Complete 100% of the main FocusRobot feature.                                                                               |
+| **Week 7**  | **Stage 4: MVP Development & Execution**       | Complete approximately 50% of the main Kaboom! feature.                                                                  |
+| **Week 8**  | **Stage 4: MVP Development & Execution**       | Complete 100% of the main Kaboom! feature.                                                                               |
 | **Week 9**  | **Stage 4: MVP Development & Execution**       | Complete secondary features and integrate required third-party services.                                                    |
 | **Week 10** | **Stage 4: MVP Development & Execution**       | Perform unit and integration testing and complete optional features if time allows.                                         |
 | **Week 11** | **Stage 5: Project Closure**                   | Prepare the project poster, final presentation, and landing page.                                                           |
@@ -135,7 +135,7 @@ Duration: 2 weeks
 
 ## Project Success Criteria
 
-The FocusRobot MVP will be considered successful if the team can demonstrate a working system in which:
+The Kaboom! MVP will be considered successful if the team can demonstrate a working system in which:
 
 * A user can start a focus session.
 * The camera can detect basic focus-related behaviors.

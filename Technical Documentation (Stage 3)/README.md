@@ -54,7 +54,7 @@
 
 11. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
    
-12. 1. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
+12. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
 
 ### Should Have
 

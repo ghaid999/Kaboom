@@ -446,17 +446,6 @@ sequenceDiagram
 
 ## 5. API Specifications
 
-| Action | Endpoint |
-|---|---|
-| Register / Login | `POST /auth/register` / `POST /auth/login` |
-| User data | `GET/PUT/DELETE /users/me` |
-| Robot | `POST /robot/connect`, `GET /robot` |
-| Start session | `POST /sessions` |
-| Pause / Continue / End | `PATCH /sessions/{id}/pause`, `/continue`, `/end` |
-| History and summary | `GET /sessions`, `GET /sessions/{id}` |
-| Products | `GET /products`, `POST /products` (admin) |
-| Purchase | `POST /purchases` |
-
 ### 5.1 API Style and Authentication
 
 Kaboom! uses a REST API built with Spring Boot. REST endpoints use JSON request and response bodies over HTTPS. The Flutter mobile app and Raspberry Pi communicate with the Spring Boot backend. The Raspberry Pi does not communicate directly with the Flutter app.

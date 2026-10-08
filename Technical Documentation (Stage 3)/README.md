@@ -774,7 +774,7 @@ At a release milestone, the team creates a release pull request from `develop` t
 | --- | --- | --- |
 | Backend unit tests | JUnit 5 and Mockito | Reward calculation, pairing expiry, session rules, and authorization. |
 | Backend integration tests | Spring Boot Test with MySQL compatible test database | Authentication, endpoint contracts, and database persistence. |
-| API tests | Postman | Inputs, outputs, validation, authentication, and error responses. |
+| API tests | Swagger | Inputs, outputs, validation, authentication, and error responses. |
 | Flutter tests | Flutter test framework | Timer logic, state management, and user interface widgets. |
 | Pi unit tests | Pytest | State filtering, heartbeat timing, buffering, and sequence numbering. |
 | Pi linting | Ruff or Flake8 | Python style and common errors. |

@@ -63,6 +63,10 @@
    
 12. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
 
+13. As an admin, I want to log in and see my admin dashboard, so that I can manage the shop and check how the app is being used.
+
+14. As an admin, I want to add a new product to the shop, so that users have new items to spend their coins on. 
+
 ### Should Have
 
 1. As a user, I want to pause a session, so that I can take a short break without losing my progress or streak.
@@ -101,7 +105,8 @@ Interactive Figma prototype: [Kaboom! (Kaboom) Mockups](https://www.figma.com/de
 | Distracted Status in Session | <img width="150" alt="Distracted Status In Session" src="./asset/Distracted Status In Session.png" /> | Must Have 4, 5, 6 |
 | Session Complete | <img width="150" alt="Session Complete" src="./asset/Session Complete.png" /> | Must Have 7, 8, 10 (coins earned, outcome, summary) |
 | Shop | <img width="150" alt="Shop" src="./asset/Shop.png" /> | Must Have 9 (spend coins on hats, screens and effects) |
-
+| Admin | <img width="150" alt="Shop" src="./asset/Admin Dashboard.png" /> | Must Have 13 (Admin dashboard) |
+| Admin Add product | <img width="150" alt="Shop" src="./asset/Admin · Add Product.png" /> | Must Have 14 (Admin Add product) |
 
 ## 2. System Architecture
 

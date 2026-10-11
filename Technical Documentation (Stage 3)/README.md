@@ -684,15 +684,20 @@ sequenceDiagram
     participant App as Mobile App
     participant Backend as Spring Boot Backend
     participant DB as MySQL Database
- 
-    User->>App: Complete focus session
-    App->>Backend: Send session completion
-    Backend->>Backend: Calculate reward
-    Backend->>DB: Update user's coins
-    Backend->>DB: Save reward
-    DB-->>Backend: Reward saved
-    Backend-->>App: Send earned coins
-    App-->>User: Display earned coins
+
+    User->>App: End or complete focus session
+    App->>Backend: PATCH /sessions/{id}/end
+    Backend->>DB: Read state_logs for this session
+    DB-->>Backend: State intervals (focused, distracted, away)
+    Backend->>Backend: Calculate focusedSeconds, focusedPercentage, and reward
+
+    Note over Backend,DB: One transaction
+    Backend->>DB: Update focus_sessions (status = completed, end_time, focused_seconds, focused_percentage, reward_earned)
+    Backend->>DB: Update users.coins (coins + reward)
+    DB-->>Backend: Changes saved
+
+    Backend-->>App: 200 OK (status, durationSeconds, focusedPercentage, rewardEarned, totalCoins)
+    App-->>User: Display session summary and earned coins
 ```
  
 ---

@@ -626,6 +626,8 @@ The mobile app is built with Flutter. It uses the font **Readex Pro** for text a
 
 ## 4. Sequence Diagrams
 
+### 4.1 Start a focus session
+
 ```mermaid
 sequenceDiagram
     actor User
@@ -643,6 +645,9 @@ sequenceDiagram
     Backend-->>App: Session started
     App-->>User: Display active session
 ```
+
+### 4.2 Detect and report focus state
+
 ```mermaid
 sequenceDiagram
     participant Camera
@@ -673,6 +678,9 @@ sequenceDiagram
     Backend-->>App: Send live focus status
     App-->>User: Display current focus state
 ```
+
+### 4.3 End a session and earn coins
+
 ```mermaid
 sequenceDiagram
     actor User

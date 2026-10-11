@@ -115,7 +115,7 @@ flowchart TB
     User <-->|"uses app"| Frontend
     Frontend <-->|"REST API + WebSocket<br/>requests / live status"| Backend
     Backend <-->|"SQL<br/>read / write"| DB
-    Backend <-->|"WebSocket<br/>commands / focus states"| Pi
+    Backend <-->|"REST over HTTPS: polls active session, posts focus states"| Pi
     Behavior -->|"observed"| Camera
     Camera -->|"video frames<br/>(stay on device)"| Pi
     Pi -->|"expression"| Screen

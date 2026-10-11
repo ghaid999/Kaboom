@@ -1079,13 +1079,16 @@ Local development runs on each team member machine. Staging runs Spring Boot and
 Database credentials, JWT signing keys, and deployment credentials are stored in GitHub Environment secrets and deployment environment variables. They are never committed to the repository or mobile application source code.
 
 ## 7. Technical Justifications
-
-Spring Boot provides structured REST APIs, STOMP WebSocket support, Spring Security, validation, testing, and MySQL integration.
-
-MySQL fits the existing project because it stores structured related data: users, robots, focus sessions, state logs, products, and purchases.
-
-Device tokens and time limited pairing codes protect the system because the Raspberry Pi is a device, not a user. They prevent one robot from submitting events for another robot.
-
-Feature branches, pull requests, and branch protection prevent unreviewed code from reaching the stable release.
-
-Automated and manual hardware tests are required because Kaboom! includes a mobile app, backend, database, Raspberry Pi, camera, and physical robot.
+ 
+| Choice | Why we chose it | Alternatives considered |
+| --- | --- | --- |
+| **Flutter** (mobile app) | One codebase for Android and iOS, fast UI iteration with hot reload, and good STOMP and HTTP client packages. | Native Kotlin or Swift would double the front-end work for a 4 person team. |
+| **Spring Boot** (backend) | Structured REST APIs, STOMP WebSocket support, Spring Security for our own JWT auth, Bean Validation, and strong testing with JUnit and Spring Boot Test. | Django and Node/Express are lighter, but the team wanted strong typing and Spring Security for device and user tokens. |
+| **MySQL 8** (database) | Our data is structured and relational (users, robots, sessions, state logs, products, purchases). Transactions protect coin balances, and CHECK and UNIQUE constraints enforce rules in the database. | MongoDB fits less well because purchases and coins need multi row transactions. |
+| **Raspberry Pi 4** (robot) | Enough CPU to run MediaPipe face landmarks in real time, a camera interface, and a display output, at low cost. | Arduino or ESP32 cannot run the vision models; a laptop would not fit inside the robot. |
+| **OpenCV + MediaPipe** (vision) | Prebuilt face and eye landmark models that run on device, so camera frames never leave the robot. | Cloud vision APIs would send user video off the device, which conflicts with our privacy scope. |
+| **Own JWT auth with device tokens and pairing codes** | Meets the Holberton rule that authentication is built by the team. The Pi is a device, not a user, so device tokens limit each robot to its own data. | Auth0 or Firebase Auth are not allowed as the main authentication. |
+| **REST for the Pi, STOMP for the app** | The Pi only needs to poll and post small events, which REST handles simply and survives network drops with buffering. The app needs push updates, which STOMP over WebSocket gives without polling. | A WebSocket from the Pi would need reconnect handling on unstable Wi-Fi. |
+| **Feature branches and protected `main` and `develop`** | Every change is reviewed and passes CI before it reaches the stable demo build. | Pushing directly to `main` risks breaking the demo. |
+| **Automated plus manual hardware tests** | Kaboom! spans a mobile app, a backend, a database, a Raspberry Pi, a camera, and a physical robot, so unit tests alone cannot prove the full flow works. | |
+ 

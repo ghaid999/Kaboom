@@ -621,15 +621,26 @@ sequenceDiagram
     participant Backend as Spring Boot Backend
     participant DB as MySQL Database
     participant Robot as Robot
- 
+
     User->>App: Select target duration
-    App->>Backend: Start focus session
-    Backend->>DB: Create focus session
+    App->>Backend: POST /sessions (robotId, plannedDurationSeconds)
+    Backend->>DB: Create focus session (status = active)
     DB-->>Backend: Session created
-    Backend->>Robot: Start monitoring
-    Robot-->>Backend: Monitoring started
-    Backend-->>App: Session started
+    Backend-->>App: 201 Created (sessionId, startTime, status)
     App-->>User: Display active session
+
+    loop Every 5 seconds
+        Robot->>Backend: GET /robots/me/active-session (device JWT)
+        alt No active session
+            Backend-->>Robot: 204 No Content
+        else Session is active
+            Backend->>DB: Find active session for this robot
+            DB-->>Backend: Session data
+            Backend-->>Robot: 200 OK (sessionId, plannedDurationSeconds, startTime)
+        end
+    end
+
+    Robot->>Robot: Start local monitoring (camera + focus detection)
 ```
  
 ### 4.2 Detect and report focus state (User Story 5)

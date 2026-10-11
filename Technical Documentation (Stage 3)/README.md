@@ -108,7 +108,7 @@ Interactive Figma prototype: [Kaboom! (Kaboom) Mockups](https://www.figma.com/de
 | Admin | <img width="150" alt="Shop" src="./asset/Admin Dashboard.png" /> | Must Have 13 (Admin dashboard) |
 | Admin Add product | <img width="150" alt="Shop" src="./asset/Admin · Add Product.png" /> | Must Have 14 (Admin Add product) |
 
-For the complete UI design, including all screens and details, please visit our [Figma design](https://www.figma.com/design/av0ip8R6icJggihhZaXFMo/Kaboom-?node-id=164-444&t=cNKUoKWAg0DEmW5M-0).
+
 
 ## 2. System Architecture
 

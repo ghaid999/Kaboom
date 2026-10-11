@@ -1,7 +1,7 @@
 # Kaboom! — Technical Documentation
-
+ 
 ## Table of Contents
-
+ 
 1. [User Stories and Mockups](#1-user-stories-and-mockups)
    - [User Stories (MoSCoW)](#user-stories-moscow)
    - [Mockups](#mockups)
@@ -33,68 +33,46 @@
    - [6.4 Critical Test Scenarios](#64-critical-test-scenarios)
    - [6.5 Continuous Integration and Deployment](#65-continuous-integration-and-deployment)
 7. [Technical Justifications](#7-technical-justifications)
-
 ## 1. User Stories and Mockups
-
+ 
 ### User Stories (MoSCoW)
-
+ 
 ### Must Have
 1. As a user, I want to register as a new user, so that I can create an account and use the application.
-
 2. As a user, I want to log in with my email and password, so that I can securely access my account, my robot, and my session history.
-
 3. As a user, I want to connect my mobile app to the robot, so that the app can communicate with and control my robot during focus sessions.
-
 4. As a user, I want to start a focus session and select a target duration, so that I can begin working with a clear, time-bound goal.
-
 5. As a user, I want the robot to detect whether I'm FOCUSED, DISTRACTED, or AWAY, so that my attention is tracked accurately without manual input.
-
 6. As a user, I want the robot's screen to show a facial expression matching my current focus state, so that I get immediate, non-intrusive feedback.
-
 7. As a user, I want to see my live session status in the mobile app, so that I can monitor progress alongside the robot's feedback.
-
 8. As a user, I want to receive coins when I complete a session, so that I feel rewarded for staying focused.
-
 9. As a user, I want the app to confirm when a session ends (completed or cut short), so that I know the outcome clearly.
    
 10. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
-
 11. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
    
 12. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
-
 13. As an admin, I want to log in and see my admin dashboard, so that I can manage the shop and check how the app is being used.
-
 14. As an admin, I want to add a new product to the shop, so that users have new items to spend their coins on. 
-
 ### Should Have
-
+ 
 1. As a user, I want to pause a session, so that I can take a short break without losing my progress or streak.
-
 2. As a user, I want different expression "themes" for the robot, so that I can personalize how it communicates with me.
-
 ### Could Have
 1. As a user, I want to set daily or weekly focus goals, so that I can build consistent study habits.
-
 2. As a user, I want to compare my stats with friends, so that I stay motivated through light competition.
-
 3. As a user, I want a gentle audio or light cue when I'm distracted, so that I can self-correct without a jarring interruption.
-
 ### Won't Have
 1. As a user, I want the robot to physically move or gesture, so that it feels more lifelike — out of scope for a simple 3D-printed prototype.
-
 2. As a user, I want the robot to sync with third-party calendars, so that sessions are scheduled automatically.
-
 3. As a user, I want multiple user profiles on one robot, so that my family/roommates can each track their own sessions.
-
 4. As a user, I want voice control, so that I can start/stop sessions hands-free.
-
 ### Mockups
-
+ 
 Interactive Figma prototype: [Kaboom! (Kaboom) Mockups](https://www.figma.com/design/av0ip8R6icJggihhZaXFMo/Kaboom-?node-id=1-3&p=f&t=6P1tw5wPOf7ddRQe-0)
-
+ 
 #### Mockup overview
-
+ 
 | Screen | Preview | Covers |
 |---|---|---|
 | Sign Up | <img width="150" alt="Sign Up" src="./asset/Sign%20Up.png" /> | Must Have 1 (register) |
@@ -107,33 +85,33 @@ Interactive Figma prototype: [Kaboom! (Kaboom) Mockups](https://www.figma.com/de
 | Shop | <img width="150" alt="Shop" src="./asset/Shop.png" /> | Must Have 9 (spend coins on hats, screens and effects) |
 | Admin | <img width="150" alt="Shop" src="./asset/Admin Dashboard.png" /> | Must Have 13 (Admin dashboard) |
 | Admin Add product | <img width="150" alt="Shop" src="./asset/Admin · Add Product.png" /> | Must Have 14 (Admin Add product) |
-
-
-
+ 
+ 
+ 
 ## 2. System Architecture
-
+ 
 **Tech stack:** MySQL 8 (database)
-
-
+ 
+ 
 ```mermaid
 flowchart TB
     User(["USER"])
-
+ 
     Frontend["<b>FRONTEND</b><br/>Flutter<br/><br/>• Login / Register<br/>• Focus Session<br/>• Timer<br/>• Robot Status<br/>• Rewards / Store"]
-
+ 
     subgraph Cloud["Cloud Hosting"]
         Backend["<b>BACKEND</b><br/>Spring Boot<br/><br/>• Authentication<br/>• Session Management<br/>• Robot Management<br/>• Reward Management"]
         DB[("<b>DATABASE</b><br/>MySQL<br/><br/>• Users<br/>• Robots<br/>• Sessions<br/>• Events<br/>• Rewards<br/>• Store")]
     end
-
+ 
     subgraph Robot["Robot Device"]
         Pi["<b>RASPBERRY PI 4</b><br/><br/>• OpenCV<br/>• MediaPipe<br/>• Focus Detection<br/>• Robot Control"]
         Camera["Camera"]
         Screen["Screen<br/>(facial expressions)"]
     end
-
+ 
     Behavior(["User Behavior"])
-
+ 
     User <-->|"uses app"| Frontend
     Frontend <-->|"REST API + WebSocket<br/>requests / live status"| Backend
     Backend <-->|"SQL<br/>read / write"| DB
@@ -142,13 +120,13 @@ flowchart TB
     Camera -->|"video frames<br/>(stay on device)"| Pi
     Pi -->|"expression"| Screen
 ```
-
+ 
 ## 3. Components, Classes, and Database Design
-
+ 
 This section describes the back-end classes, the database design, and the main front-end components of the Kaboom system. Kaboom is a physical robot named Sparky, paired with a mobile app, that helps users stay focused during study or work sessions.
-
+ 
 ### 3.1 Class Diagram
-
+ 
 ```mermaid
 classDiagram
     class User {
@@ -247,17 +225,17 @@ classDiagram
     Admin ..> Product : manages
     User ..> Purchase : creates via buy
 ```
-
+ 
 ---
-
+ 
 ### 3.2 Class Descriptions
-
+ 
 #### 3.2.1 User
-
+ 
 **Purpose:** Represents a person who uses the Kaboom mobile app. It stores the account information and the coin balance, and it handles everything related to the account, to buying products from the shop, and to equipping the products that the user owns.
-
+ 
 **Stored in table:** `users`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | int | Unique identifier of the user. |
@@ -267,7 +245,7 @@ classDiagram
 | `coins` | int | The user's current coin balance. It increases when a session is completed and decreases when the user buys products. It can never be negative. |
 | `role` | string | Either `user` or `admin`. |
 | `createdAt` | datetime | The date and time when the account was created. |
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `register()` | bool | Creates a new account after validating the name, email, and password.|
@@ -277,31 +255,31 @@ classDiagram
 | `addReward(amount)` | void | Adds the given number of coins to the user's balance. It is called when a focus session ends. |
 | `buy(productId)` | bool | Buys one product. It checks that the product is available and not already owned by the user, and that the balance covers the price. Then it deducts the coins and creates a `Purchase`. All of these steps happen in a single transaction, so either everything succeeds or nothing changes. Returns `false` if the balance is not enough or the product cannot be bought. |
 | `equip(productId)` | bool | Equips a product that the user owns, so that it appears on the robot. Only one product per category can be equipped at a time, so any other equipped product of the same category is unequipped. Returns `false` if the user does not own the product. |
-
+ 
 **Relationships:** A user owns at most one robot, starts many focus sessions, and makes many purchases. `Admin` inherits from `User`.
-
+ 
 ---
-
+ 
 #### 3.2.2 Admin
-
+ 
 **Purpose:** Represents the administrator of the shop. The system has exactly one admin. The admin is a normal user with `role = 'admin'`, so `Admin` inherits all attributes and methods of `User`.
-
+ 
 **Stored in table:** `users` (there is no separate table).
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `addProduct(product)` | bool | Adds a new product to the shop, with its name, category, price, and description. Only the admin can call this method. |
-
+ 
 **Relationships:** Inherits from `User`. Manages `Product`.
-
+ 
 ---
-
+ 
 #### 3.2.3 FocusSession
-
+ 
 **Purpose:** Represents one focus session, from the moment the user starts it until it ends. It tracks the time, the paused time, the focused time, and the reward earned.
-
+ 
 **Stored in table:** `focus_sessions`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `sessionId` | int | Unique identifier of the session. |
@@ -316,7 +294,7 @@ classDiagram
 | `focusedPercentage` | float | The percentage of the active time in which the user was focused. It is empty until the session ends. |
 | `rewardEarned` | int | The number of coins earned from this session. |
 | `status` | string | One of `active`, `paused`, or `completed`. |
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `startSession()` | void | Creates the session with the status `active` and records the start time. |
@@ -325,17 +303,17 @@ classDiagram
 | `endSession()` | void | Ends the session. It sets the end time and the duration, calculates the focused time, and the reward, and sets the status to `completed`. |
 | `calculateReward()` | int | Calculates the number of coins earned, based on the reward rule defined by the team. |
 | `sessionSummary()` | dict | Returns the summary shown to the user: the focused time, and the coins earned. |
-
+ 
 **Relationships:** Belongs to one user. May use one robot. Has many `StateLog` records.
-
+ 
 ---
-
+ 
 #### 3.2.4 StateLog
-
+ 
 **Purpose:** Records each period in which the user stayed in one state during a session. The user's state can change many times in one session, for example from focused to distracted and back to focused. These records are used to calculate the focused time and the focus percentage.
-
+ 
 **Stored in table:** `state_logs`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | int | Unique identifier of the record. |
@@ -343,66 +321,66 @@ classDiagram
 | `state` | string | One of `focused`, `distracted`, or `away`. |
 | `startedAt` | datetime | When the user entered this state. |
 | `endedAt` | datetime | When the user left this state. It is empty while this is the current state. |
-
+ 
 **Meaning of the states:**
-
+ 
 | State | Meaning |
 |---|---|
 | `focused` | The user is looking at the work and paying attention. |
 | `distracted` | The user is present but not paying attention. |
 | `away` | The user is not in front of the camera. |
-
+ 
 **Relationships:** Belongs to one `FocusSession`. 
-
+ 
 ---
-
+ 
 #### 3.2.5 Robot
-
+ 
 **Purpose:** Represents the physical robot that belongs to a user. It shows a face expression on its screen that reflects the user's current state, and it keeps track of whether it is connected to the app. Each user has at most one robot.
-
+ 
 **Stored in table:** `robots`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `robotId` | int | Unique identifier of the robot. |
 | `userId` | int | The user who owns the robot. Each user can have only one. |
 | `currentExpression` | string | The face currently shown on the robot's screen. |
 | `connectionState` | string | Either `connected` or `disconnected`. |
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `updateExpression(state)` | void | Changes the robot's face according to the user's state.|
-| `connect()` | bool | Pairs the robot with the app and sets `connectionState` to `connected`. Returns `false` if the connection fails. |
-
+| `connect()` | bool | Pairs the robot with the user's account using the 6-digit code shown on the robot's screen, and sets `connectionState` to `connected`. Returns `false` if the code is wrong or expired. |
+ 
 **Relationships:** Belongs to one user. Runs many focus sessions. Uses one `ComputerVision` module.
-
+ 
 ---
-
+ 
 #### 3.2.6 ComputerVision
-
+ 
 **Purpose:** The module that analyzes the camera image and decides the user's current state. It works with live images only. It does not store any video or photo, and only the resulting state is saved in `state_logs`.
-
+ 
 **Stored in table:** None. This is a logic class only.
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `eyesDetection` | bool | Whether the user's eyes are detected in the current camera image. |
 | `state` | string | The state detected most recently: `focused`, `distracted`, or `away`. |
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `detectState()` | string | Analyzes the current camera image and returns `focused`, `distracted`, or `away`. The exact detection rules are defined by the Computer Vision team. For example, no face in the image means `away`. |
-
+ 
 **Relationships:** Used by one `Robot`. Provides the state that is recorded in `StateLog`.
-
+ 
 ---
-
+ 
 #### 3.2.7 Product
-
+ 
 **Purpose:** Represents an item that users can buy in the shop with their coins.
-
+ 
 **Stored in table:** `products`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | int | Unique identifier of the product. |
@@ -411,21 +389,21 @@ classDiagram
 | `price` | int | The price in coins. It must be greater than zero. |
 | `description` | string | An optional description of the product. |
 | `isAvailable` | bool | Whether the product can currently be bought.|
-
+ 
 | Method | Returns | Description |
 |---|---|---|
 | `getProducts(category)` | list | A static method that returns all available products to show in the shop. If a category is given, it returns only the products of that category. |
-
+ 
 **Relationships:** Added and managed by `Admin`. Appears in many `Purchase` records.
-
+ 
 ---
-
+ 
 #### 3.2.8 Purchase
-
+ 
 **Purpose:** Represents one purchase made by a user. Each purchase is for exactly one product. It stores the price paid, so the purchase history stays correct even if the product price changes later. It also records whether the user has equipped the product on the robot, which is shown as "Equipped" in the shop.
-
+ 
 **Stored in table:** `purchases`
-
+ 
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | int | Unique identifier of the purchase. |
@@ -434,13 +412,13 @@ classDiagram
 | `pricePaid` | int | The price of the product at the time of the purchase. |
 | `purchasedAt` | datetime | When the purchase was made. |
 | `isEquipped` | bool | Whether the user has currently equipped this product on the robot. The default is `false`. |
-
+ 
 **Relationships:** Belongs to one user. Is for one `Product`.
-
+ 
 ---
-
+ 
 ### 3.3 ER Diagram
-
+ 
 ```mermaid
 erDiagram
     USERS ||--o| ROBOTS : owns
@@ -449,7 +427,7 @@ erDiagram
     FOCUS_SESSIONS ||--o{ STATE_LOGS : has
     USERS ||--o{ PURCHASES : makes
     PRODUCTS ||--o{ PURCHASES : "bought in"
-
+ 
     USERS {
         int id PK
         varchar name
@@ -460,14 +438,14 @@ erDiagram
         tinyint admin_flag UK "generated, NULL for non-admin"
         datetime created_at
     }
-
+ 
     ROBOTS {
         int id PK
         int user_id FK, UK
         enum current_expression "smile, eyes_closed, wink, distressed, round_eyes"
         enum connection_state "connected, disconnected"
     }
-
+ 
     FOCUS_SESSIONS {
         int id PK
         int user_id FK
@@ -482,7 +460,7 @@ erDiagram
         int reward_earned
         enum status "active, paused, completed"
     }
-
+ 
     STATE_LOGS {
         bigint id PK
         int session_id FK
@@ -490,7 +468,7 @@ erDiagram
         datetime started_at
         datetime ended_at "nullable"
     }
-
+ 
     PRODUCTS {
         int id PK
         varchar name
@@ -499,7 +477,7 @@ erDiagram
         text description "nullable"
         boolean is_available
     }
-
+ 
     PURCHASES {
         int id PK
         int user_id FK
@@ -509,17 +487,17 @@ erDiagram
         boolean is_equipped
     }
 ```
-
+ 
 **Key**
-
+ 
 | Abbreviation | Meaning |
 |---|---|
 | PK | Primary Key: uniquely identifies each row. |
 | FK | Foreign Key: refers to a row in another table. |
 | UK | Unique Key: the value cannot be repeated in another row. |
-
+ 
 **Relationships**
-
+ 
 | Relationship | Meaning |
 |---|---|
 | User 1 : 0..1 Robot | Each user has at most one robot. |
@@ -528,13 +506,13 @@ erDiagram
 | FocusSession 1 : N StateLog | A session records many state changes. |
 | User 1 : N Purchase | A user can make many purchases. |
 | Purchase N : 1 Product | Each purchase is for one product, and a product can appear in many purchases. |
-
+ 
 ---
-
+ 
 ### 3.4 Database Schema (MySQL 8)
-
+ 
 Create the tables in the order shown, because later tables depend on earlier ones through foreign keys. 
-
+ 
 ```sql
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -603,25 +581,24 @@ CREATE TABLE purchases (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 ```
-
+ 
 ---
-
+ 
 ### 3.5 Front-end Components
-
+ 
 The mobile app is built with Flutter. It uses the font **Readex Pro** for text and **JetBrains Mono** for timers and numbers. The main screens and their interactions are:
-
+ 
 - **Sign Up Screen:** Lets a new user create an account with a name, email, and password, and then moves the user to the Login screen.
 - **Login Screen:** Lets the user sign in with an email and password and moves the user to the Homepage. 
 - **Homepage:** Shows the robot face, the "Ready to Focus?" timer, and the Start Session button. It also opens the side menu.
 - **Focus Session Screen:** Shows the countdown timer, the user's current state (focused, distracted, or away) through a status chip and the robot face, and an End Session button. It updates the state every few seconds. 
 - **Session Complete Screen:** Shows a celebration animation, the time focused, and the coins earned, with buttons that lead to the Shop or back to the Homepage.
 - **Shop Screen:** Shows the coin balance, the category filters (All, Hats, Screens, and Kaboom FX), and the product cards, and lets the user buy a product. Products that the user has equipped show the label "Equipped".
-- **Robot Connection Screen:** Scans for nearby robots and pairs the app with the user's robot.
+- **Robot Connection Screen:** Asks the user to enter the 6-digit code shown on the robot's screen, then pairs the robot with the user's account.
 - **Progress / History Screen:** Lists the user's past sessions with their focused time and coins.
 - **Add Product Screen (admin only):** Lets the admin add a product to the shop.
-
 **Reusable components:**
-
+ 
 - **RobotFace:** Shows one of the five robot faces.
 - **StatusChip:** Shows the current state with an icon (Focused, Distracted, or Away).
 - **CircularTimer:** Shows a progress ring with the time in the center.
@@ -633,11 +610,10 @@ The mobile app is built with Flutter. It uses the font **Readex Pro** for text a
 - **SummaryCard:** Shows the time focused and the coins earned.
 - **ConfettiOverlay:** The celebration animation.
 - **HamburgerButton and BackButton:** Open the side menu and return to the previous screen.
-
 ## 4. Sequence Diagrams
-
+ 
 ### 4.1 Start a focus session (User Story 4)
-
+ 
 ```mermaid
 sequenceDiagram
     actor User
@@ -645,7 +621,7 @@ sequenceDiagram
     participant Backend as Spring Boot Backend
     participant DB as MySQL Database
     participant Robot as Robot
-
+ 
     User->>App: Select target duration
     App->>Backend: Start focus session
     Backend->>DB: Create focus session
@@ -655,9 +631,9 @@ sequenceDiagram
     Backend-->>App: Session started
     App-->>User: Display active session
 ```
-
+ 
 ### 4.2 Detect and report focus state (User Story 5)
-
+ 
 ```mermaid
 sequenceDiagram
     participant Camera
@@ -667,11 +643,11 @@ sequenceDiagram
     participant DB as MySQL Database
     participant App as Mobile App
     participant Screen as Robot Display
-
+ 
     Camera->>Robot: Capture video frames
     Robot->>CV: Process video frame
     CV->>CV: Detect focus state
-
+ 
     alt User is focused
         CV-->>Robot: FOCUSED
         Robot->>Screen: Display focused expression
@@ -682,22 +658,22 @@ sequenceDiagram
         CV-->>Robot: AWAY
         Robot->>Screen: Display away expression
     end
-
+ 
     Robot->>Backend: Send focus state
     Backend->>DB: Save focus event
     Backend-->>App: Send live focus status
     App-->>User: Display current focus state
 ```
-
+ 
 ### 4.3 End a session and earn coins (User Story 8)
-
+ 
 ```mermaid
 sequenceDiagram
     actor User
     participant App as Mobile App
     participant Backend as Spring Boot Backend
     participant DB as MySQL Database
-
+ 
     User->>App: Complete focus session
     App->>Backend: Send session completion
     Backend->>Backend: Calculate reward
@@ -707,71 +683,79 @@ sequenceDiagram
     Backend-->>App: Send earned coins
     App-->>User: Display earned coins
 ```
-
+ 
 ---
-
+ 
 ## 5. API Specifications
-
+ 
 ### 5.1 API Style and Authentication
-
+ 
 Kaboom! uses a REST API built with Spring Boot. REST endpoints use JSON request and response bodies over HTTPS. The Flutter mobile app and Raspberry Pi communicate with the Spring Boot backend. The Raspberry Pi does not communicate directly with the Flutter app.
-
+ 
 REST base path:
-
+ 
 ```text
 /api/v1
 ```
-
+ 
 User endpoints require a user JWT access token:
-
+ 
 ```text
 Authorization: Bearer <user_access_token>
 ```
-
+ 
 The Raspberry Pi is a device, not a user. It receives a device JWT during pairing. A device JWT contains a `robotId` claim and can only submit data for that robot.
-
+ 
 ### 5.2 External APIs and Local Technology Integrations
-
+ 
 The MVP uses no third party cloud API.
-
+ 
 The following local technologies are used on the Raspberry Pi:
-
+ 
 | Technology | Purpose | Reason for selection |
 | --- | --- | --- |
 | OpenCV | Capture and process camera frames | Reliable computer vision support for Raspberry Pi. |
 | MediaPipe | Detect face and eye landmarks | Efficient prebuilt models for focus related behavior detection. |
 | STOMP over WebSocket | Send live backend updates to Flutter | Supported by Spring Boot and suitable for authenticated live updates. |
-
+ 
 Camera frames are processed on the Raspberry Pi and are not stored in the backend. The Pi sends only the detected state and its metadata.
-
+ 
 The Pi sends one event when the state changes and sends a heartbeat every 30 seconds during an active session. It does not send one request for every camera frame.
-
+ 
 ### 5.3 Robot Pairing and Device Access
-
-1. An authenticated user creates a temporary pairing code.
-2. The user enters the pairing code into the Raspberry Pi setup screen.
-3. The Pi pairs with the Spring Boot backend using its serial number and pairing code.
-4. The backend returns a robot identifier, device access token, and device refresh token.
-5. The Pi stores its tokens securely and uses the device access token for robot endpoints.
-
-Pairing code endpoint:
-
+ 
+The robot shows a pairing code on its screen and the user types it into the app. The robot has a display but no keyboard, so the code always goes from the robot to the app.
+ 
+1. When the robot starts and has no device tokens, it requests a pairing code from the backend with its serial number.
+2. The backend returns a 6-digit `pairingCode` and a one-time `pairingSecret`. The robot shows the code on its screen and keeps the secret in memory.
+3. The user opens the Connect screen in the app and enters the code.
+4. The app sends the code with the user JWT. The backend links the robot to that user.
+5. The robot checks the pairing status every 3 seconds with its `pairingSecret`. Once the user has claimed the code, the backend returns the robot identifier, device access token, and device refresh token, one time only.
+6. The robot stores its tokens securely and uses the device access token for robot endpoints.
+Request a pairing code (robot):
+ 
 ```text
 POST /api/v1/robots/pairing-codes
 ```
-
-Robot pairing endpoint:
-
+ 
+Claim a pairing code (app):
+ 
 ```text
 POST /api/v1/robots/pair
 ```
-
-A pairing code can be used once and expires after ten minutes. If a device token does not match the robot identifier in the URL, the backend returns `403 Forbidden`.
-
+ 
+Collect device tokens (robot):
+ 
+```text
+POST /api/v1/robots/pairing-status
+```
+ 
+A pairing code expires after ten minutes and can be claimed once. The robot then requests a new code. The `pairingSecret` is sent in the request body, never in the URL, and only its hash is stored. If a device token does not match the robot identifier in the URL, the backend returns `403 Forbidden`.
+ 
 ### 5.4 Internal API Endpoint Contracts
-
+ 
 #### Authentication and User Endpoints
-
+ 
 | Method and path | Access | Input JSON | Output JSON |
 | --- | --- | --- | --- |
 | `POST /auth/register` | Public | `name`, `email`, `password` | `message`, `user` |
@@ -781,24 +765,25 @@ A pairing code can be used once and expires after ten minutes. If a device token
 | `GET /users/me` | User JWT | None | `id`, `name`, `email`, `coins`, `role` |
 | `PUT /users/me` | User JWT | Optional `name`, `email`, `password` | Updated `user` |
 | `DELETE /users/me` | User JWT | None | `message` |
-
+ 
 #### Robot Endpoints
-
+ 
 | Method and path | Access | Input JSON or query | Output JSON |
 | --- | --- | --- | --- |
-| `POST /robots/pairing-codes` | User JWT | None | `pairingCode`, `expiresAt` |
-| `POST /robots/pair` | Valid pairing code | `serialNumber`, `pairingCode` | `robotId`, `deviceAccessToken`, `deviceRefreshToken`, `expiresInSeconds` |
+| `POST /robots/pairing-codes` | Robot, no token | `serialNumber` | `pairingCode`, `pairingSecret`, `expiresAt` |
+| `POST /robots/pair` | User JWT | `pairingCode` | `robotId`, `serialNumber`, `connectionState`; `404 Not Found` for an unknown or expired code; `409 Conflict` if the user already has a different robot |
+| `POST /robots/pairing-status` | Valid `pairingSecret` | `pairingSecret` | `{"status": "pending"}` until claimed, then `robotId`, `deviceAccessToken`, `deviceRefreshToken`, `expiresInSeconds` (returned once); `410 Gone` if expired |
 | `GET /robots/me` | User JWT | None | `id`, `currentExpression`, `connectionState` |
 | `GET /robots/me/active-session` | Device JWT | None | `sessionId`, `plannedDurationSeconds`, `startTime`, `status`; or `204 No Content` |
 | `POST /robots/{robotId}/focus-states` | Device JWT with matching robot claim | `sessionId`, `state`, `timestamp`, `sequenceNumber`, `eventType` | `message`, `robotExpression`, `acceptedSequenceNumber` |
 | `POST /robots/{robotId}/disconnect` | User JWT and owner check | None | `message` |
-
+ 
 The Pi checks `GET /robots/me/active-session` every five seconds. A returned active session starts local monitoring. A `204 No Content` response means no session is active.
-
+ 
 The `focus-states` endpoint accepts `STATE_CHANGE` or `HEARTBEAT` values for `eventType`. `state` must be `FOCUSED`, `DISTRACTED`, or `AWAY`.
-
+ 
 #### Focus Session Endpoints
-
+ 
 | Method and path | Access | Input JSON or query | Output JSON |
 | --- | --- | --- | --- |
 | `POST /sessions` | User JWT | `robotId`, `plannedDurationSeconds` | `id`, `robotId`, `plannedDurationSeconds`, `startTime`, `status` |
@@ -807,9 +792,9 @@ The `focus-states` endpoint accepts `STATE_CHANGE` or `HEARTBEAT` values for `ev
 | `PATCH /sessions/{id}/end` | User JWT and owner check | None | `status`, `durationSeconds`, `focusedPercentage`, `rewardEarned`, `totalCoins` |
 | `GET /sessions?page=0&size=20&sort=startTime,desc` | User JWT | Pagination query parameters | `content`, `page`, `size`, `totalElements`, `totalPages` |
 | `GET /sessions/{id}` | User JWT and owner check | None | Session summary and state statistics |
-
+ 
 #### Store and Purchase Endpoints
-
+ 
 | Method and path | Access | Input JSON or query | Output JSON |
 | --- | --- | --- | --- |
 | `GET /products` | User JWT | None | Available product list |
@@ -817,24 +802,24 @@ The `focus-states` endpoint accepts `STATE_CHANGE` or `HEARTBEAT` values for `ev
 | `POST /purchases` | User JWT | `productId` | `purchase`, `remainingCoins` |
 | `GET /purchases?page=0&size=20` | User JWT | Pagination query parameters | Paginated purchase history |
 | `GET /users/me/items` | User JWT | None | Previously purchased products |
-
+ 
 `POST /products` checks the existing `role` field. Only a user with `role = admin` can create a product. All other users receive `403 Forbidden`.
-
+ 
 ### 5.5 Key Request and Response Examples
-
+ 
 #### Log in
-
+ 
 ```text
 POST /api/v1/auth/login
 ```
-
+ 
 ```json
 {
   "email": "user@example.com",
   "password": "SecurePassword123"
 }
 ```
-
+ 
 ```json
 {
   "accessToken": "user_access_token",
@@ -849,20 +834,61 @@ POST /api/v1/auth/login
   }
 }
 ```
-
+ 
 #### Pair a robot
-
+ 
+The robot requests a code:
+ 
+```text
+POST /api/v1/robots/pairing-codes
+```
+ 
+```json
+{
+  "serialNumber": "KABOOM-PI-001"
+}
+```
+ 
+```json
+{
+  "pairingCode": "483921",
+  "pairingSecret": "one_time_pairing_secret",
+  "expiresAt": "2026-10-07T14:10:00Z"
+}
+```
+ 
+The user enters the code shown on the robot's screen in the app:
+ 
 ```text
 POST /api/v1/robots/pair
 ```
-
+ 
 ```json
 {
-  "serialNumber": "KABOOM-PI-001",
   "pairingCode": "483921"
 }
 ```
-
+ 
+```json
+{
+  "robotId": 1,
+  "serialNumber": "KABOOM-PI-001",
+  "connectionState": "connected"
+}
+```
+ 
+The robot collects its device tokens:
+ 
+```text
+POST /api/v1/robots/pairing-status
+```
+ 
+```json
+{
+  "pairingSecret": "one_time_pairing_secret"
+}
+```
+ 
 ```json
 {
   "robotId": 1,
@@ -871,20 +897,20 @@ POST /api/v1/robots/pair
   "expiresInSeconds": 900
 }
 ```
-
+ 
 #### Start a focus session
-
+ 
 ```text
 POST /api/v1/sessions
 ```
-
+ 
 ```json
 {
   "robotId": 1,
   "plannedDurationSeconds": 1800
 }
 ```
-
+ 
 ```json
 {
   "id": 25,
@@ -894,13 +920,13 @@ POST /api/v1/sessions
   "status": "active"
 }
 ```
-
+ 
 #### Send a focus state from the Raspberry Pi
-
+ 
 ```text
 POST /api/v1/robots/1/focus-states
 ```
-
+ 
 ```json
 {
   "sessionId": 25,
@@ -910,7 +936,7 @@ POST /api/v1/robots/1/focus-states
   "eventType": "STATE_CHANGE"
 }
 ```
-
+ 
 ```json
 {
   "message": "Focus state recorded successfully",
@@ -918,13 +944,13 @@ POST /api/v1/robots/1/focus-states
   "acceptedSequenceNumber": 42
 }
 ```
-
+ 
 #### End a focus session
-
+ 
 ```text
 PATCH /api/v1/sessions/25/end
 ```
-
+ 
 ```json
 {
   "id": 25,
@@ -935,45 +961,44 @@ PATCH /api/v1/sessions/25/end
   "totalCoins": 146
 }
 ```
-
+ 
 ### 5.6 Session and Reward Rules
-
+ 
 1. A user may have only one active or paused focus session. Starting another session returns `409 Conflict`.
 2. Only an active session can be paused. Pausing an already paused or completed session returns `409 Conflict`.
 3. Only a paused session can be resumed. Resuming an active or completed session returns `409 Conflict`.
 4. Only an active or paused session can be ended. Ending an already completed session returns `409 Conflict`.
 5. A user can access only their own sessions. An attempt to access another user session returns `404 Not Found`.
-
 The Spring Boot backend calculates rewards. The Flutter app and Raspberry Pi never calculate or submit a reward amount.
-
+ 
 ```text
 rewardEarned = min(30, floor(focusedDurationSeconds / 60))
 ```
-
+ 
 The backend derives `focusedDurationSeconds` from timestamped state intervals. Paused time does not count. Sessions shorter than 60 seconds earn zero coins. The maximum reward per session is 30 coins.
-
+ 
 For a 30 minute session with 88.5 percent focus, the user has approximately 1,593 focused seconds and earns 26 coins.
-
+ 
 ### 5.7 Live Updates
-
+ 
 Spring Boot is the STOMP over WebSocket server. The Pi posts states to the REST API. The backend publishes live session updates to Flutter.
-
+ 
 The Flutter app connects to:
-
+ 
 ```text
 /ws
 ```
-
+ 
 The app supplies its user JWT in the STOMP `CONNECT` header. Spring Security validates the token. The app subscribes to its own session updates only:
-
+ 
 ```text
 /user/queue/sessions/{sessionId}
 ```
-
+ 
 The backend verifies that the authenticated user owns the session before allowing the subscription or publishing updates.
-
+ 
 ### 5.8 Error Response Format
-
+ 
 ```json
 {
   "timestamp": "2026-10-07T14:10:00Z",
@@ -989,27 +1014,26 @@ The backend verifies that the authenticated user owns the session before allowin
   ]
 }
 ```
-
+ 
 Common status codes are `200` for success, `201` for creation, `204` for no active session, `400` for invalid input, `401` for missing or invalid authentication, `403` for insufficient permission, `404` for unavailable resources, `409` for conflicts, and `500` for unexpected server errors.
-
+ 
 ### 5.9 Database Alignment Required for These Endpoints
-
+ 
 The existing Stage 3 schema already includes `users`, `robots`, `focus_sessions`, `state_logs`, `products`, and `purchases`. To fully support the API contracts above, the database design owner must add the following before implementation:
-
+ 
 1. A unique `serial_number` field in `robots` for device pairing.
-2. A `pairing_codes` table containing code, user identifier, expiration time, and used status.
+2. A `pairing_codes` table containing the code, the robot's serial number, a hash of the `pairingSecret`, the user who claimed it (empty until claimed), expiration time, and status (`pending`, `claimed`, or `used`).
 3. A `refresh_tokens` table containing a hashed token, token type, owner identifier, expiry time, and revocation status.
 4. `sequence_number` and `event_type` fields in `state_logs`.
 5. A uniqueness rule for `session_id` and `sequence_number` in `state_logs` to prevent duplicate buffered events.
-
 These additions support the same existing project scope and do not change the core entity relationships.
-
+ 
 ## 6. SCM and QA Plan
-
+ 
 ### 6.1 Source Control Management
-
+ 
 The team uses Git and GitHub.
-
+ 
 | Branch | Purpose |
 | --- | --- |
 | `main` | Stable release ready code only. |
@@ -1017,9 +1041,9 @@ The team uses Git and GitHub.
 | `feature/<feature-name>` | New feature development. |
 | `fix/<issue-name>` | Bug fixes. |
 | `docs/<topic>` | Documentation changes. |
-
+ 
 Examples:
-
+ 
 ```text
 feature/user-authentication
 feature/focus-session-api
@@ -1028,15 +1052,15 @@ feature/flutter-session-screen
 fix/coin-calculation
 docs/api-specifications
 ```
-
+ 
 Each contributor creates a branch from `develop`, makes focused commits, and opens a pull request to `develop`. At least one teammate must approve the pull request before merge.
-
+ 
 At a release milestone, the team creates a release pull request from `develop` to `main`. It requires passing CI checks, one approval, and a successful final demo smoke test.
-
+ 
 `main` and `develop` are protected branches. Direct pushes are disabled. Pull requests require passing checks and one approval.
-
+ 
 ### 6.2 QA Strategy
-
+ 
 | Test area | Tool or method | Coverage |
 | --- | --- | --- |
 | Backend unit tests | JUnit 5 and Mockito | Reward calculation, pairing expiry, session rules, and authorization. |
@@ -1047,11 +1071,11 @@ At a release milestone, the team creates a release pull request from `develop` t
 | Pi linting | Ruff or Flake8 | Python style and common errors. |
 | Hardware tests | Raspberry Pi, camera, and display | Detection state, connection, and robot expressions. |
 | End to end tests | Manual scenario checklist | Login, focus session, reward, and purchase flow. |
-
+ 
 ### 6.3 Detection Accuracy Evaluation
-
+ 
 Stage 2 requires at least 80 percent correct focus detection across five users. The team will evaluate that goal using the following test matrix. Each condition is tested at least three times per user and recorded as correct or incorrect.
-
+ 
 | Condition | Test cases | Expected outcome |
 | --- | --- | --- |
 | Lighting | Bright indoor, dim, side light | Stable state or reduced confidence. |
@@ -1059,11 +1083,11 @@ Stage 2 requires at least 80 percent correct focus detection across five users. 
 | Head angle | Forward, left, right, downward | Short natural movements are not classified as away. |
 | Distance | Near, normal desk distance, far | System identifies when the user is outside reliable camera range. |
 | Focus state | Focused, distracted, away | Displayed state matches observed behavior. |
-
+ 
 The MVP does not claim medical grade attention or sleep detection.
-
+ 
 ### 6.4 Critical Test Scenarios
-
+ 
 1. Valid registration creates an account.
 2. Existing email registration returns `409 Conflict`.
 3. Valid login returns access and refresh tokens.
@@ -1080,22 +1104,20 @@ The MVP does not claim medical grade attention or sleep detection.
 14. Concurrent purchases cannot spend more coins than the user owns.
 15. A nonadmin cannot create products and receives `403 Forbidden`.
 16. The Pi buffers and resubmits events after a network dropout.
-
 ### 6.5 Continuous Integration and Deployment
-
+ 
 GitHub Actions runs on every pull request to `develop` and `main`.
-
+ 
 1. Build the Spring Boot backend.
 2. Run backend unit and integration tests.
 3. Run Flutter tests.
 4. Run Python linting and Pytest for Raspberry Pi logic.
 5. Run formatting and static analysis checks.
 6. Report whether the pull request can merge.
-
 Local development runs on each team member machine. Staging runs Spring Boot and MySQL in Docker services for integration and Raspberry Pi hardware testing. The production demo uses the stable final release.
-
+ 
 Database credentials, JWT signing keys, and deployment credentials are stored in GitHub Environment secrets and deployment environment variables. They are never committed to the repository or mobile application source code.
-
+ 
 ## 7. Technical Justifications
  
 | Choice | Why we chose it | Alternatives considered |
@@ -1109,4 +1131,5 @@ Database credentials, JWT signing keys, and deployment credentials are stored in
 | **REST for the Pi, STOMP for the app** | The Pi only needs to poll and post small events, which REST handles simply and survives network drops with buffering. The app needs push updates, which STOMP over WebSocket gives without polling. | A WebSocket from the Pi would need reconnect handling on unstable Wi-Fi. |
 | **Feature branches and protected `main` and `develop`** | Every change is reviewed and passes CI before it reaches the stable demo build. | Pushing directly to `main` risks breaking the demo. |
 | **Automated plus manual hardware tests** | Kaboom! spans a mobile app, a backend, a database, a Raspberry Pi, a camera, and a physical robot, so unit tests alone cannot prove the full flow works. | |
+ 
  

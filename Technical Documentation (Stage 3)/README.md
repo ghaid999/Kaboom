@@ -40,7 +40,7 @@
 ### Must Have
 1. As a user, I want to register as a new user, so that I can create an account and use the application.
 2. As a user, I want to log in with my email and password, so that I can securely access my account, my robot, and my session history.
-3. As a user, I want to connect my mobile app to the robot, so that the app can communicate with and control my robot during focus sessions.
+3. As a user, I want to link my robot to my account using the code on its screen, so that my sessions are tracked by my robot.
 4. As a user, I want to start a focus session and select a target duration, so that I can begin working with a clear, time-bound goal.
 5. As a user, I want the robot to detect whether I'm FOCUSED, DISTRACTED, or AWAY, so that my attention is tracked accurately without manual input.
 6. As a user, I want the robot's screen to show a facial expression matching my current focus state, so that I get immediate, non-intrusive feedback.
@@ -51,8 +51,8 @@
 10. As a user, I want to spend earned coins to customize the robot with clothes and accessories, so that I feel a sense of progression and ownership.
 11. As a user, I want a short summary after each session (e.g., time focused vs. distracted), so that I understand how well I actually focused.
    
-12. As a user, I want to view a history of past sessions, so that I can track my focus trends over time.
-13. As an admin, I want to log in and see my admin dashboard, so that I can manage the shop and check how the app is being used.
+12. As a user, I want to view a history of past sessions, so that I can track my focus trends over time
+13. As an admin, I want to log in and see my admin dashboard, so that I can manage the shop.
 14. As an admin, I want to add a new product to the shop, so that users have new items to spend their coins on. 
 ### Should Have
  

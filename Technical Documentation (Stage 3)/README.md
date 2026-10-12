@@ -13,9 +13,9 @@
    - [3.4 Database Schema (MySQL 8)](#34-database-schema-mysql-8)
    - [3.5 Front-end Components](#35-front-end-components)
 4. [Sequence Diagrams](#4-sequence-diagrams)
-   - [4.1 Start a focus session](#41-start-a-focus-session)
-   - [4.2 Detect and report focus state](#42-detect-and-report-focus-state)
-   - [4.3 End a session and earn coins](#43-end-a-session-and-earn-coins)
+   - [4.1 Start a focus session](#41-start-a-focus-session-user-story-4)
+   - [4.2 Detect and report focus state](#42-detect-and-report-focus-state-user-story-5)
+   - [4.3 End a session and earn coins](#43-end-a-session-and-earn-coins-user-story-8)
 5. [API Specifications](#5-api-specifications)
    - [5.1 API Style and Authentication](#51-api-style-and-authentication)
    - [5.2 External APIs and Local Technology Integrations](#52-external-apis-and-local-technology-integrations)
@@ -130,7 +130,7 @@ This section describes the back-end classes, the database design, and the main f
 ```mermaid
 classDiagram
     class User {
-        +int id
+        +UUID id
         +string name
         +string email
         -string passwordHash
@@ -151,9 +151,9 @@ classDiagram
     }
  
     class FocusSession {
-        +int sessionId
-        +int userId
-        +int robotId
+        +UUID sessionId
+        +UUID userId
+        +UUID robotId
         +int plannedDurationSeconds
         +datetime startTime
         +datetime endTime
@@ -172,16 +172,16 @@ classDiagram
     }
  
     class StateLog {
-        +int id
-        +int sessionId
+        +UUID id
+        +UUID sessionId
         +string state
         +datetime startedAt
         +datetime endedAt
     }
  
     class Robot {
-        +int robotId
-        +int userId
+        +UUID robotId
+        +UUID userId
         +string currentExpression
         +string connectionState
         +updateExpression(state) void
@@ -195,7 +195,7 @@ classDiagram
     }
  
     class Product {
-        +int id
+        +UUID id
         +string name
         +string category
         +int price
@@ -205,9 +205,9 @@ classDiagram
     }
  
     class Purchase {
-        +int id
-        +int userId
-        +int productId
+        +UUID id
+        +UUID userId
+        +UUID productId
         +int pricePaid
         +datetime purchasedAt
         +bool isEquipped
@@ -238,7 +238,7 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `id` | int | Unique identifier of the user. |
+| `id` | UUID | Unique identifier of the user. |
 | `name` | string | The user's display name. |
 | `email` | string | The user's email address. It must be unique and is used to log in. |
 | `passwordHash` | string | The user's password, stored in hashed form. The plain password is never stored. This attribute is private. |
@@ -282,9 +282,9 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `sessionId` | int | Unique identifier of the session. |
-| `userId` | int | The user who owns the session. |
-| `robotId` | int | The robot used in the session. It can be empty if no robot was connected. |
+| `sessionId` | UUID | Unique identifier of the session. |
+| `userId` | UUID | The user who owns the session. |
+| `robotId` | UUID | The robot used in the session. It can be empty if no robot was connected. |
 | `plannedDurationSeconds` | int | The duration chosen by the user before starting, in seconds. |
 | `startTime` | datetime | When the session started. |
 | `endTime` | datetime | When the session ended. It is empty until the session ends. |
@@ -316,7 +316,7 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `id` | int | Unique identifier of the record. |
+| `id` | UUID | Unique identifier of the record. |
 | `sessionId` | int | The session that this record belongs to. |
 | `state` | string | One of `focused`, `distracted`, or `away`. |
 | `startedAt` | datetime | When the user entered this state. |
@@ -342,8 +342,8 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `robotId` | int | Unique identifier of the robot. |
-| `userId` | int | The user who owns the robot. Each user can have only one. |
+| `robotId` | UUID | Unique identifier of the robot. |
+| `userId` | UUID | The user who owns the robot. Each user can have only one. |
 | `currentExpression` | string | The face currently shown on the robot's screen. |
 | `connectionState` | string | Either `connected` or `disconnected`. |
  
@@ -383,7 +383,7 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `id` | int | Unique identifier of the product. |
+| `id` | UUID | Unique identifier of the product. |
 | `name` | string | The product name. |
 | `category` | string | One of `hat`, `screen`, or `effect`. It matches the shop tabs Hats, Screens, and Kaboom FX. |
 | `price` | int | The price in coins. It must be greater than zero. |
@@ -406,9 +406,9 @@ classDiagram
  
 | Attribute | Type | Description |
 |---|---|---|
-| `id` | int | Unique identifier of the purchase. |
-| `userId` | int | The user who made the purchase. |
-| `productId` | int | The product that was bought. |
+| `id` | UUID | Unique identifier of the purchase. |
+| `userId` | UUID | The user who made the purchase. |
+| `productId` | UUID | The product that was bought. |
 | `pricePaid` | int | The price of the product at the time of the purchase. |
 | `purchasedAt` | datetime | When the purchase was made. |
 | `isEquipped` | bool | Whether the user has currently equipped this product on the robot. The default is `false`. |
